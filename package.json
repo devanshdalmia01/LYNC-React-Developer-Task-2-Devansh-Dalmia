@@ -1,5 +1,5 @@
 {
-  "name": "my-vue-app",
+  "name": "lync-react-developer-task-2-devansh-dalmia",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,12 +10,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "@reduxjs/toolkit": "^2.2.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-redux": "^9.1.1",
+    "react-router-dom": "^6.23.0",
+    "react-toastify": "^10.0.5",
+    "react-tooltip": "^5.26.4",
+    "redux-persist": "^6.0.0",
+    "redux-thunk": "^3.1.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
+    "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
     "@vitejs/plugin-react": "^4.2.1",
