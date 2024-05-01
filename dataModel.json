@@ -1,0 +1,56 @@
+{
+    "mainExplorer": [
+        {
+            "id": "0",
+            "name": "Main Folder",
+            "isFolder": true,
+            "items": [
+                { "id": "1", "name": "File 1.abc", "isFolder": false, "items": [] },
+                {
+                    "id": "2",
+                    "name": "Sub Folder",
+                    "isFolder": true,
+                    "items": [
+                        { "id": "3", "name": "File 2.xyz", "isFolder": false, "items": [] },
+                        {
+                            "id": "4",
+                            "name": "Sub Sub Folder",
+                            "isFolder": true,
+                            "items": [
+                                { "id": "5", "name": "File 3.mno", "isFolder": false, "items": [] },
+                                { "id": "6", "name": "Sub Sub Sub Folder", "isFolder": true, "items": [] }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "recycleBin": [
+        {
+            "id": "0",
+            "name": "Main Folder",
+            "isFolder": true,
+            "items": [
+                { "id": "1", "name": "File 1.ijk", "isFolder": false, "items": [] },
+                {
+                    "id": "2",
+                    "name": "Sub Folder",
+                    "isFolder": true,
+                    "items": [
+                        { "id": "3", "name": "File 2.asd", "isFolder": false, "items": [] },
+                        {
+                            "id": "4",
+                            "name": "Sub Sub Folder",
+                            "isFolder": true,
+                            "items": [
+                                { "id": "5", "name": "File 3.def", "isFolder": false, "items": [] },
+                                { "id": "6", "name": "Sub Sub Sub Folder", "isFolder": true, "items": [] }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

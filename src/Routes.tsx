@@ -6,6 +6,7 @@ export default function Routes() {
         <BrowserRouter>
             <RouterRoutes>
                 <Route path="/" element={<HomePage />} />
+                <Route path="/recyclebiin" element={<HomePage />} />
             </RouterRoutes>
         </BrowserRouter>
     );
