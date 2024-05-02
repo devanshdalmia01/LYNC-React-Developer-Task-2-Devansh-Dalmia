@@ -1,56 +1,23 @@
 {
-    "mainExplorer": [
-        {
-            "id": "0",
-            "name": "Main Folder",
-            "isFolder": true,
-            "items": [
-                { "id": "1", "name": "File 1.abc", "isFolder": false, "items": [] },
-                {
-                    "id": "2",
-                    "name": "Sub Folder",
-                    "isFolder": true,
-                    "items": [
-                        { "id": "3", "name": "File 2.xyz", "isFolder": false, "items": [] },
-                        {
-                            "id": "4",
-                            "name": "Sub Sub Folder",
-                            "isFolder": true,
-                            "items": [
-                                { "id": "5", "name": "File 3.mno", "isFolder": false, "items": [] },
-                                { "id": "6", "name": "Sub Sub Sub Folder", "isFolder": true, "items": [] }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    ],
-    "recycleBin": [
-        {
-            "id": "0",
-            "name": "Main Folder",
-            "isFolder": true,
-            "items": [
-                { "id": "1", "name": "File 1.ijk", "isFolder": false, "items": [] },
-                {
-                    "id": "2",
-                    "name": "Sub Folder",
-                    "isFolder": true,
-                    "items": [
-                        { "id": "3", "name": "File 2.asd", "isFolder": false, "items": [] },
-                        {
-                            "id": "4",
-                            "name": "Sub Sub Folder",
-                            "isFolder": true,
-                            "items": [
-                                { "id": "5", "name": "File 3.def", "isFolder": false, "items": [] },
-                                { "id": "6", "name": "Sub Sub Sub Folder", "isFolder": true, "items": [] }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
+    "explorerItems": {
+        "0": { "name": "🏠 Home", "isFolder": true, "parentId": "null", "isExpanded": true },
+        "1": { "name": "Main Folder", "isFolder": true, "parentId": "0", "isExpanded": false },
+        "2": { "name": "File 1.abc", "isFolder": false, "parentId": "1" },
+        "3": { "name": "Sub Folder", "isFolder": true, "parentId": "1", "isExpanded": false },
+        "4": { "name": "File 2.xyz", "isFolder": false, "parentId": "3" },
+        "5": { "name": "Sub Sub Folder", "isFolder": true, "parentId": "3", "isExpanded": false },
+        "6": { "name": "File 3.mno", "isFolder": false, "parentId": "5" },
+        "7": { "name": "Sub Sub Sub Folder", "isFolder": true, "parentId": "5", "isExpanded": false },
+        "8": { "name": "File 4.pqr", "isFolder": false, "parentId": "7" },
+        "9": { "name": "Another Folder", "isFolder": true, "parentId": "0", "isExpanded": true },
+        "10": { "name": "File 5.txt", "isFolder": false, "parentId": "9" },
+        "11": { "name": "Document.docx", "isFolder": false, "parentId": "9" }
+    },
+    "recycleBinItems": {
+        "-1": { "name": "🗑️ Recycle Bin", "isFolder": true, "parentId": null },
+        "13": { "name": "Old File.txt", "isFolder": false, "parentId": "1" },
+        "14": { "name": "Deleted Document.docx", "isFolder": false, "parentId": "9" }
+    },
+    "currentLocation": ["0", "1", "3", "5"],
+    "selectedObjects": []
 }

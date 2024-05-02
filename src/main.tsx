@@ -1,4 +1,3 @@
-import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import Routes from "./Routes";
 import { ToastContainer } from "react-toastify";
@@ -9,19 +8,17 @@ import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-    <StrictMode>
-        <Provider store={store}>
-            <PersistGate loading={null} persistor={persistor}>
-                <Routes />
-                <ToastContainer
-                    theme="colored"
-                    position="bottom-center"
-                    autoClose={5000}
-                    hideProgressBar={true}
-                    pauseOnFocusLoss
-                    pauseOnHover
-                />
-            </PersistGate>
-        </Provider>
-    </StrictMode>
+    <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+            <Routes />
+            <ToastContainer
+                theme="colored"
+                position="bottom-center"
+                autoClose={5000}
+                hideProgressBar={true}
+                pauseOnFocusLoss
+                pauseOnHover
+            />
+        </PersistGate>
+    </Provider>
 );

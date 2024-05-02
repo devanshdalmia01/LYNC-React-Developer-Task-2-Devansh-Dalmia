@@ -1,13 +1,15 @@
+import { FC } from "react";
 import { BrowserRouter, Route, Routes as RouterRoutes } from "react-router-dom";
-import HomePage from "./Pages/HomePage";
+import MainPage from "./Pages/MainPage";
 
-export default function Routes() {
+const Routes: FC = () => {
     return (
         <BrowserRouter>
             <RouterRoutes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/recyclebiin" element={<HomePage />} />
+                <Route path="/" element={<MainPage />} />
             </RouterRoutes>
         </BrowserRouter>
     );
-}
+};
+
+export default Routes;
