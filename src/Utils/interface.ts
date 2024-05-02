@@ -1,3 +1,6 @@
+import { BUTTONS, MODALS } from "./enums";
+import { Dispatch, SetStateAction } from "react";
+
 export interface FileFolderType {
     name: string;
     isFolder: boolean;
@@ -15,7 +18,8 @@ export interface MainDataType {
     explorerItems: ExplorerItemsType;
     recycleBinItems: RecycleBinItemsType;
     currentLocation: string[];
-    selectedObjects: string[];
+    selectedItems: string[];
+    inRecycleBin: boolean;
 }
 
 export interface FileFolderPropType {
@@ -38,4 +42,17 @@ export interface DeleteRestoreFileFolderActionPayloadType {
     payload: {
         id: string;
     };
+}
+
+export interface ButtonPropType {
+    type: BUTTONS;
+}
+
+export interface ModalPropType {
+    open: boolean;
+    setOpen: Dispatch<SetStateAction<boolean>>;
+    data: string;
+    setData: Dispatch<SetStateAction<string>>;
+    setAccept: Dispatch<SetStateAction<boolean>>;
+    type: MODALS;
 }

@@ -11,10 +11,15 @@ import { v4 as uuidv4 } from "uuid";
 const dataSlice = createSlice({
     name: "data",
     initialState: {
-        explorerItems: {},
-        recycleBinItems: {},
-        currentLocation: [],
-        selectedObjects: [],
+        explorerItems: {
+            "0": { name: "🏠 Home", isFolder: true, parentId: "-1", isExpanded: true },
+        },
+        recycleBinItems: {
+            "0": { name: "🗑️ Recycle Bin", isFolder: true, parentId: "-1" },
+        },
+        currentLocation: ["0"],
+        selectedItems: [],
+        inRecycleBin: false,
     },
     reducers: {
         NewFileFolder(state: MainDataType, action: NewFileFolderActionPayloadType) {
@@ -22,14 +27,15 @@ const dataSlice = createSlice({
 
             // Check if parent exists
             if (!state.explorerItems[parentId]) {
-                toast.error("Parent folder does not exist.");
+                throw new Error("Parent folder does not exist.");
             }
 
             // Check for duplicate names within the same directory
             const siblings = Object.values(state.explorerItems).filter((item) => item.parentId === parentId);
-
-            if (siblings.some((item) => item.name === name)) {
-                toast.error("A file or folder with the same name already exists in this directory.");
+            if (siblings.some((item) => item.name === name && item.isFolder === isFolder)) {
+                throw new Error(
+                    `A ${!isFolder ? "file" : "folder"} with the same name already exists in this directory.`
+                );
             }
 
             // Generate a new unique ID
@@ -53,15 +59,16 @@ const dataSlice = createSlice({
             const { id, newName }: { id: string; newName: string } = action.payload;
             const item = state.explorerItems[id];
             if (!item) {
-                toast.error("Item not found.");
+                throw new Error("File/Folder not found.");
             }
-
             // Check for duplicate names in the same directory
             const siblings = Object.entries(state.explorerItems)
                 .filter(([key, value]) => value.parentId === item.parentId && key !== id)
                 .map(([_, value]) => value);
-            if (siblings.some((it) => it.name === newName)) {
-                toast.error("Another item in the same directory already has this name.");
+            if (siblings.some((it) => it.name === newName && it.isFolder === item.isFolder)) {
+                throw new Error(
+                    `Another ${item.isFolder ? "folder" : "file"} in the same directory already has this name.`
+                );
             }
             state.explorerItems[id] = { ...item, name: newName };
         },
@@ -69,7 +76,7 @@ const dataSlice = createSlice({
             const { id }: { id: string } = action.payload;
             const item = state.explorerItems[id];
             if (!item) {
-                toast.error("File not found!"); // Or return a message indicating failure
+                throw new Error("File not found!");
             }
             state.explorerItems = Object.fromEntries(
                 Object.entries(state.explorerItems).filter(([key, _]) => key !== id)
@@ -82,7 +89,7 @@ const dataSlice = createSlice({
             const { id }: { id: string } = action.payload;
             const item = state.recycleBinItems[id];
             if (!item) {
-                toast.error("File not found in recycle bin!"); // Or return a message indicating failure
+                throw new Error("File not found in recycle bin!");
             }
             state.recycleBinItems = Object.fromEntries(
                 Object.entries(state.recycleBinItems).filter(([key, _]) => key !== id)
@@ -95,7 +102,7 @@ const dataSlice = createSlice({
             const { id }: { id: string } = action.payload;
             const item = state.explorerItems[id];
             if (!item) {
-                toast.error("Folder not found!"); // Or return a message indicating failure
+                throw new Error("Folder not found!");
             }
             let newItems = { ...state.explorerItems };
             let newRecycleBin = { ...state.recycleBinItems };
@@ -115,7 +122,7 @@ const dataSlice = createSlice({
             const { id }: { id: string } = action.payload;
             const item = state.recycleBinItems[id];
             if (!item) {
-                toast.error("Folder not found in recycle bin!"); // Or return a message indicating failure
+                throw new Error("Folder not found in recycle bin!");
             }
             let newItems = { ...state.explorerItems };
             let newRecycleBin = { ...state.recycleBinItems };
@@ -133,7 +140,7 @@ const dataSlice = createSlice({
         },
         EmptyRecycleBin(state: MainDataType) {
             if (!Object.keys(state.recycleBinItems).length) {
-                toast.error("Recycle bin empty!");
+                throw new Error("Recycle bin empty!");
             }
             Object.keys(state.recycleBinItems).forEach((id: string) => delete state.recycleBinItems[id]);
         },
@@ -141,7 +148,7 @@ const dataSlice = createSlice({
             const { id }: { id: string } = action.payload;
             const item = state.recycleBinItems[id];
             if (!item) {
-                toast.error("File not found in recycle bin!"); // Or return a message indicating failure
+                throw new Error("File not found in recycle bin!");
             }
             delete state.recycleBinItems[id];
         },
@@ -149,7 +156,7 @@ const dataSlice = createSlice({
             const { id }: { id: string } = action.payload;
             const item = state.recycleBinItems[id];
             if (!item) {
-                toast.error("Folder not found in recycle bin!"); // Or return a message indicating failure
+                throw new Error("Folder not found in recycle bin!");
             }
             let newRecycleBin = { ...state.recycleBinItems };
             function recursiveDelete(itemId: string) {
@@ -162,9 +169,13 @@ const dataSlice = createSlice({
             recursiveDelete(id);
             state.recycleBinItems = newRecycleBin;
         },
+        ChangeRootFolder(state: MainDataType) {
+            state.inRecycleBin = !state.inRecycleBin;
+        },
         ChangeParent(state, action) {},
         ChangeCurrentLocation(state, action) {},
         SelectFileFolder(state, action) {},
+        DeSelectFileFolder(state, action) {},
     },
 });
 
@@ -178,9 +189,11 @@ export const {
     EmptyRecycleBin,
     PermanentDeleteFile,
     PermanentDeleteFolder,
+    ChangeRootFolder,
     ChangeParent,
     ChangeCurrentLocation,
     SelectFileFolder,
+    DeSelectFileFolder,
 } = dataSlice.actions;
 
 export default dataSlice.reducer;

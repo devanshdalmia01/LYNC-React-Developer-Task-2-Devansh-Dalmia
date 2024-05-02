@@ -14,8 +14,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <ToastContainer
                 theme="colored"
                 position="bottom-center"
-                autoClose={5000}
-                hideProgressBar={true}
+                autoClose={3000}
+                hideProgressBar={false}
                 pauseOnFocusLoss
                 pauseOnHover
             />

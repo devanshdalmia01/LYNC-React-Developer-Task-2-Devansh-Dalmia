@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { MainDataType, ExplorerItemsType } from "../Utils/interface";
 import File from "./File";
 import Folder from "./Folder";
+import { BUTTONS } from "../Utils/enums";
 
 const MainExplorer = () => {
     const explorerItems: ExplorerItemsType = useSelector((state: MainDataType) => state["explorerItems"]);
@@ -33,8 +34,8 @@ const MainExplorer = () => {
                     );
                 })}
             <div className="filesandfolder"></div>
-            <Button></Button>
-            <Button></Button>
+            <Button type={BUTTONS.ADD_FILE} />
+            <Button type={BUTTONS.ADD_FOLDER} />
         </main>
     );
 };

@@ -1,10 +1,12 @@
-import { FC } from "react";
+import { FC, MouseEvent } from "react";
 import { FileFolderPropType } from "../Utils/interface";
 import File from "./File";
 import { ExplorerItemsType, MainDataType } from "../Utils/interface";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { ChangeRootFolder } from "../redux/storingData";
 
-const Folder: FC<FileFolderPropType> = ({ itemId, item }) => {
+const Folder: FC<FileFolderPropType> = ({ itemId, item }: FileFolderPropType) => {
+    const dispatch = useDispatch();
     // TODO try to use memo or callback whereever state remains the same
     const explorerItems: ExplorerItemsType = useSelector((state: MainDataType) => state["explorerItems"]);
     // TODO transfer this function to common functions
@@ -19,10 +21,20 @@ const Folder: FC<FileFolderPropType> = ({ itemId, item }) => {
 
     // Combine folders first and then files for display
     const sortedChildren: string[] = [...folders, ...files];
+    const inRecycleBin: boolean = useSelector((state: MainDataType) => state["inRecycleBin"]);
     return (
         <>
             {/* TODO call expand/collapse function */}
-            <div className="folder">
+            <div
+                className="folder cursor-pointer"
+                onClick={(e: MouseEvent) => {
+                    e.stopPropagation();
+                    if (inRecycleBin && itemId === "0") {
+                        dispatch(ChangeRootFolder());
+                    }
+                    return;
+                }}
+            >
                 {item.isExpanded ? "-" : "+"} 🗂️ {item.name}
             </div>
             {item.isExpanded &&
