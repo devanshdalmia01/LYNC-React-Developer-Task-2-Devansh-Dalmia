@@ -23,7 +23,6 @@ export interface MainDataType {
     explorerItems: ExplorerItemsType;
     recycleBinItems: RecycleBinItemsType;
     currentPath: ActiveFolderType[];
-    selectedItems: string[];
     inRecycleBin: boolean;
 }
 
@@ -79,4 +78,9 @@ export interface ViewPropType {
 export interface NavbarViewPropType {
     view: VIEW;
     setView: Dispatch<SetStateAction<VIEW>>;
+}
+
+export interface SelectedItemContextType {
+    selectedItem: string;
+    setSelectedItem: Dispatch<SetStateAction<string>>;
 }

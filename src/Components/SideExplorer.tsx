@@ -9,11 +9,11 @@ const SideExplorer: FC = () => {
     const dispatch = useDispatch();
     const explorerItems: ExplorerItemsType = useSelector((state: MainDataType) => state["explorerItems"]);
     const recycleBinItemCount: number = useSelector(
-        (state: MainDataType) => Object.values(state["recycleBinItems"]).length - 1
+        (state: MainDataType) => Object.values(state["recycleBinItems"]).length
     );
     const inRecycleBin: boolean = useSelector((state: MainDataType) => state["inRecycleBin"]);
     return (
-        <nav className="bg-tertiary flex flex-col w-[390px] h-[78vh] pb-20 pr-1.5 text-quinary">
+        <nav className="bg-tertiary flex flex-col w-[390px] h-[78vh] overflow-y-scroll pb-20 pr-1.5 text-quinary">
             <div className="flex-grow">
                 <SidebarFolder itemId={"0"} item={explorerItems[0]} />
             </div>

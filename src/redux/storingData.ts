@@ -8,6 +8,7 @@ import {
     ActiveFolderType,
 } from "../Utils/interface";
 import { v4 as uuidv4 } from "uuid";
+
 // TODO Check memory leaks
 const dataSlice = createSlice({
     name: "data",
@@ -15,34 +16,27 @@ const dataSlice = createSlice({
         explorerItems: {
             "0": { name: "Home", isFolder: true, parentId: "-1", isExpanded: true },
         },
-        recycleBinItems: {
-            "0": { name: "Recycle Bin", isFolder: true, parentId: "-1" },
-        },
+        recycleBinItems: {},
         currentPath: [{ id: "0", isActive: true }],
-        selectedItems: [],
         inRecycleBin: false,
     },
     reducers: {
         NewFileFolder(state: MainDataType, action: NewFileFolderActionPayloadType) {
             const { name, isFolder, parentId }: { name: string; isFolder: boolean; parentId: string } = action.payload;
 
-            // Check if parent exists
+            if (!name.length) {
+                throw new Error("Please enter something.");
+            }
             if (!state.explorerItems[parentId]) {
                 throw new Error("Parent folder does not exist.");
             }
-
-            // Check for duplicate names within the same directory
             const siblings = Object.values(state.explorerItems).filter((item) => item.parentId === parentId);
             if (siblings.some((item) => item.name === name && item.isFolder === isFolder)) {
                 throw new Error(
                     `A ${!isFolder ? "file" : "folder"} with the same name already exists in this directory.`
                 );
             }
-
-            // Generate a new unique ID
             const newId = uuidv4();
-
-            // Add the new file or folder
             isFolder
                 ? (state.explorerItems[newId] = {
                       name,
@@ -58,11 +52,13 @@ const dataSlice = createSlice({
         },
         RenameFileFolder(state: MainDataType, action: RenameFileFolderActionPayloadType) {
             const { id, newName }: { id: string; newName: string } = action.payload;
+            if (!newName.length) {
+                throw new Error("Please enter something.");
+            }
             const item = state.explorerItems[id];
             if (!item) {
                 throw new Error("File/Folder not found.");
             }
-            // Check for duplicate names in the same directory
             const siblings = Object.entries(state.explorerItems)
                 .filter(([key, value]) => value.parentId === item.parentId && key !== id)
                 .map(([_, value]) => value);
@@ -110,10 +106,10 @@ const dataSlice = createSlice({
             function recurseDelete(itemId: string) {
                 const children = Object.entries(newItems).filter(([_, value]) => value.parentId === itemId);
                 children.forEach(([childId, _]) => {
-                    recurseDelete(childId); // Recursively delete children
+                    recurseDelete(childId);
                 });
-                newRecycleBin[itemId] = newItems[itemId]; // Move item to recycle bin
-                delete newItems[itemId]; // Remove item from active items
+                newRecycleBin[itemId] = newItems[itemId];
+                delete newItems[itemId];
             }
             recurseDelete(id);
             state.explorerItems = newItems;
@@ -130,10 +126,10 @@ const dataSlice = createSlice({
             function recurseRestore(itemId: string) {
                 const children = Object.entries(newRecycleBin).filter(([_, value]) => value.parentId === itemId);
                 children.forEach(([childId, _]) => {
-                    recurseRestore(childId); // Recursively delete children
+                    recurseRestore(childId);
                 });
-                newItems[itemId] = newRecycleBin[itemId]; // Move item to recycle bin
-                delete newRecycleBin[itemId]; // Remove item from active items
+                newItems[itemId] = newRecycleBin[itemId];
+                delete newRecycleBin[itemId];
             }
             recurseRestore(id);
             state.explorerItems = newItems;
@@ -165,19 +161,16 @@ const dataSlice = createSlice({
                 children.forEach(([childId, _]) => {
                     recursiveDelete(childId);
                 });
-                delete newRecycleBin[itemId]; // Remove item from active items
+                delete newRecycleBin[itemId];
             }
             recursiveDelete(id);
             state.recycleBinItems = newRecycleBin;
         },
         ChangeRootFolder(state: MainDataType) {
-            state.currentPath = [];
             state.inRecycleBin = !state.inRecycleBin;
         },
         ChangeParent(state, action) {},
         ChangeCurrentPath(state, action) {},
-        SelectFileFolder(state, action) {},
-        DeSelectFileFolder(state, action) {},
         ExpandFolder(state: MainDataType, action: ExpandCollapseActionPayloadType) {
             const { id }: { id: string } = action.payload;
             const item = state.explorerItems[id];
@@ -226,8 +219,6 @@ export const {
     ChangeRootFolder,
     ChangeParent,
     ChangeCurrentPath,
-    SelectFileFolder,
-    DeSelectFileFolder,
     ExpandFolder,
     CollapseFolder,
     GoToPreviousFolder,

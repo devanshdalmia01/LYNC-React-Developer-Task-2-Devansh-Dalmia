@@ -1,32 +1,19 @@
 import Button from "./Button";
 import { FC } from "react";
 import { useSelector } from "react-redux";
-import { MainDataType, ExplorerItemsType, ActiveFolderType, ViewPropType } from "../Utils/interface";
-import MainFile from "./MainFile";
-import MainFolder from "./MainFolder";
-import { BUTTONS, NAV_BUTTONS } from "../Utils/enums";
+import { MainDataType, ActiveFolderType, ViewPropType, RecycleBinItemsType, FileFolderType } from "../Utils/interface";
+import MainItem from "./MainItem";
+import { BUTTONS, NAV_BUTTONS, VIEW } from "../Utils/enums";
 import NavButton from "./NavButton";
+import MainItemExplorer from "./MainItemExplorer";
 
 const MainExplorer: FC<ViewPropType> = ({ view }: ViewPropType) => {
-    const explorerItems: ExplorerItemsType = useSelector((state: MainDataType) => state["explorerItems"]);
+    const recycleBinItems: RecycleBinItemsType = useSelector((state: MainDataType) => state["recycleBinItems"]);
     const currentPath: ActiveFolderType[] = useSelector((state: MainDataType) => state["currentPath"]);
-    const activePos: number = currentPath.findIndex((item: ActiveFolderType) => item.isActive);
-    // Separate children into folders and files
-    const childrenIDs: string[] = Object.keys(explorerItems).filter(
-        (key) => explorerItems[key].parentId === currentPath[activePos].id
-    );
-    const folders: string[] = childrenIDs
-        .filter((id) => explorerItems[id].isFolder)
-        .sort((a, b) => explorerItems[a].name.localeCompare(explorerItems[b].name));
-    const files: string[] = childrenIDs
-        .filter((id) => !explorerItems[id].isFolder)
-        .sort((a, b) => explorerItems[a].name.localeCompare(explorerItems[b].name));
-
-    // Combine folders first and then files for display
-    const sortedChildren: string[] = [...folders, ...files];
     const inRecycleBin: boolean = useSelector((state: MainDataType) => state["inRecycleBin"]);
+    const activePos: number = currentPath.findIndex((item: ActiveFolderType) => item.isActive);
     return (
-        <main className="bg-quaternary w-[74vw] h-[82.5vh] pt-5">
+        <main className="bg-quaternary w-[74vw] h-[82.5vh] pt-8 overflow-y-scroll">
             {!inRecycleBin && (
                 <div className="flex">
                     <div className="flex-grow">
@@ -39,14 +26,19 @@ const MainExplorer: FC<ViewPropType> = ({ view }: ViewPropType) => {
                     </div>
                 </div>
             )}
-            {sortedChildren.length > 0 &&
-                sortedChildren.map((itemId: string, index: number) => {
-                    return explorerItems[itemId].isFolder ? (
-                        <MainFolder key={index} itemId={itemId} item={explorerItems[itemId]} view={view} />
-                    ) : (
-                        <MainFile key={index} itemId={itemId} item={explorerItems[itemId]} view={view}/>
-                    );
-                })}
+            <div
+                className={`mt-8 ml-10 ${
+                    view === VIEW.GRID ? "grid grid-cols-5 space-y-reverse space-y-5 pb-5" : "flex flex-col pb-5"
+                }`}
+            >
+                {!inRecycleBin ? (
+                    <MainItemExplorer view={view} />
+                ) : (
+                    Object.entries(recycleBinItems).map((value: [string, FileFolderType], index: number) => {
+                        return <MainItem key={index} itemId={value[0]} item={value[1]} view={view} />;
+                    })
+                )}
+            </div>
         </main>
     );
 };

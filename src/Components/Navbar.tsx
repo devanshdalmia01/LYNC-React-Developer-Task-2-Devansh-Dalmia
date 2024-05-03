@@ -39,7 +39,7 @@ const Navbar: FC<NavbarViewPropType> = ({ view, setView }: NavbarViewPropType) =
                         })}
                     </>
                 ) : (
-                    <BreadcrumbButton name={`Recycle Bin`} />
+                    <div className="text-4xl font-extrabold mt-4">🗑️ Recycle Bin</div>
                 )}
             </section>
             <section className="flex items-center mr-10 w-[92px]">

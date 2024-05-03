@@ -16,7 +16,6 @@ const SidebarFolder: FC<FileFolderPropType> = ({ itemId, item }: FileFolderPropT
     // TODO try to use memo or callback whereever state remains the same
     const explorerItems: ExplorerItemsType = useSelector((state: MainDataType) => state["explorerItems"]);
     // TODO transfer this function to common functions
-    // Separate children into folders and files
     const childrenIDs: string[] = Object.keys(explorerItems).filter((key) => explorerItems[key].parentId === itemId);
     const folders: string[] = childrenIDs
         .filter((id) => explorerItems[id].isFolder)
@@ -24,8 +23,6 @@ const SidebarFolder: FC<FileFolderPropType> = ({ itemId, item }: FileFolderPropT
     const files: string[] = childrenIDs
         .filter((id) => !explorerItems[id].isFolder)
         .sort((a, b) => explorerItems[a].name.localeCompare(explorerItems[b].name));
-
-    // Combine folders first and then files for display
     const sortedChildren: string[] = [...folders, ...files];
     const inRecycleBin: boolean = useSelector((state: MainDataType) => state["inRecycleBin"]);
     return (

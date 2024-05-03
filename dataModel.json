@@ -23,6 +23,5 @@
         { "id": "1", "isActive": false },
         { "id": "3", "isActive": false },
         { "id": "5", "isActive": true }
-    ],
-    "selectedItems": []
+    ]
 }
