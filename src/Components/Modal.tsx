@@ -1,5 +1,5 @@
-import { FC, ChangeEvent, MouseEvent } from "react";
-import { Dialog } from "@headlessui/react";
+import { FC, ChangeEvent, MouseEvent, Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
 import { ModalPropType } from "../Utils/interface";
 import { MODALS } from "../Utils/enums";
 
@@ -17,7 +17,7 @@ const Modal: FC<ModalPropType> = ({ open, setOpen, data, setData, setAccept, typ
             break;
         case MODALS.NEW_FILE:
         case MODALS.NEW_FOLDER:
-            title = `New ${type === MODALS.NEW_FOLDER ? "Folder" : "File"}`;
+            title = `Create New ${type === MODALS.NEW_FOLDER ? "Folder" : "File"}`;
             description = `Enter name of the ${type === MODALS.NEW_FOLDER ? "folder" : "file"}`;
             rejectButton = "Cancel";
             acceptButton = "Create";
@@ -46,63 +46,91 @@ const Modal: FC<ModalPropType> = ({ open, setOpen, data, setData, setAccept, typ
             break;
     }
     return (
-        <Dialog
-            className="relative z-50"
-            open={open}
-            onClose={() => {
-                setOpen(false);
-                setData("");
-                setAccept(false);
-            }}
-        >
-            <Dialog.Panel className="w-full max-w-sm rounded bg-black text-white">
-                <Dialog.Title>{title}</Dialog.Title>
-                <Dialog.Description>{description}</Dialog.Description>
-                {(type === MODALS.NEW_FILE ||
-                    type === MODALS.NEW_FOLDER ||
-                    type === MODALS.RENAME_FILE ||
-                    type === MODALS.RENAME_FOLDER) && (
-                    <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
-                        <label htmlFor="name" className="block text-sm font-semibold leading-6 text-gray-900">
-                            Name
-                        </label>
-                        <div className="mt-2.5">
-                            {/* TODO Check empty name */}
-                            <input
-                                value={data}
-                                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                    e.preventDefault();
-                                    setData(e.target.value);
-                                }}
-                                type="text"
-                                name="name"
-                                id="name"
-                                autoComplete="name"
-                                className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            />
-                        </div>
+        <Transition appear show={open} as={Fragment}>
+            <Dialog
+                as="div"
+                className="relative z-50"
+                open={open}
+                onClose={() => {
+                    setOpen(false);
+                    setData("");
+                    setAccept(false);
+                }}
+            >
+                <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <div className="fixed inset-0 bg-black/25" />
+                </Transition.Child>
+                <div className="fixed inset-0 overflow-y-auto">
+                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+                        <Transition.Child
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0 scale-95"
+                            enterTo="opacity-100 scale-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100 scale-100"
+                            leaveTo="opacity-0 scale-95"
+                        >
+                            <Dialog.Panel className="w-1/3 h-72 p-8 rounded-3xl flex flex-col bg-quinary text-black">
+                                <div className="flex-grow">
+                                    <Dialog.Title as="h1" className={"text-start text-3xl font-bold mb-4"}>
+                                        {title}
+                                    </Dialog.Title>
+                                    <Dialog.Description className={"text-start text-lg font-medium"}>
+                                        {description}
+                                    </Dialog.Description>
+                                    {/* TODO Check empty name */}
+                                    {(type === MODALS.NEW_FILE ||
+                                        type === MODALS.NEW_FOLDER ||
+                                        type === MODALS.RENAME_FILE ||
+                                        type === MODALS.RENAME_FOLDER) && (
+                                        <input
+                                            value={data}
+                                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                                e.preventDefault();
+                                                setData(e.target.value);
+                                            }}
+                                            type="text"
+                                            className="mt-2.5 block focus:outline-none w-full rounded-md border-[1px] border-gray-400 px-3 py-2 text-gray-900"
+                                        />
+                                    )}
+                                </div>
+                                <div className="flex self-end">
+                                    <button
+                                        className="flex items-center bg-quinary border-[1px] border-gray-400 pb-2 pt-2.5 px-6 text-lg font-semibold rounded-full text-tertiary mr-5"
+                                        onClick={(e: MouseEvent) => {
+                                            e.preventDefault();
+                                            setOpen(false);
+                                            setData("");
+                                            setAccept(false);
+                                        }}
+                                    >
+                                        {rejectButton}
+                                    </button>
+                                    <button
+                                        className="flex items-center bg-primary border-[1px] pb-2 pt-2.5 px-6 text-lg font-semibold rounded-full text-quinary"
+                                        onClick={(e: MouseEvent) => {
+                                            e.preventDefault();
+                                            setAccept(true);
+                                        }}
+                                    >
+                                        {acceptButton}
+                                    </button>
+                                </div>
+                            </Dialog.Panel>
+                        </Transition.Child>
                     </div>
-                )}
-                <button
-                    onClick={(e: MouseEvent) => {
-                        e.preventDefault();
-                        setOpen(false);
-                        setData("");
-                        setAccept(false);
-                    }}
-                >
-                    {rejectButton}
-                </button>
-                <button
-                    onClick={(e: MouseEvent) => {
-                        e.preventDefault();
-                        setAccept(true);
-                    }}
-                >
-                    {acceptButton}
-                </button>
-            </Dialog.Panel>
-        </Dialog>
+                </div>
+            </Dialog>
+        </Transition>
     );
 };
 

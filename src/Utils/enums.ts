@@ -3,6 +3,18 @@ export enum BUTTONS {
     ADD_FOLDER,
     DELETE,
     RENAME,
+    PERMANENT_DELETE,
+    EMPTY_BIN,
+}
+
+export enum NAV_BUTTONS {
+    BACK_BUTTON,
+    NEXT_BUTTON,
+}
+
+export enum VIEW {
+    GRID,
+    LIST,
 }
 
 export enum MODALS {

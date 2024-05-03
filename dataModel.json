@@ -18,6 +18,11 @@
         "13": { "name": "Old File.txt", "isFolder": false, "parentId": "1" },
         "14": { "name": "Deleted Document.docx", "isFolder": false, "parentId": "9" }
     },
-    "currentLocation": ["0", "1", "3", "5"],
+    "currentPath": [
+        { "id": "0", "isActive": false },
+        { "id": "1", "isActive": false },
+        { "id": "3", "isActive": false },
+        { "id": "5", "isActive": true }
+    ],
     "selectedItems": []
 }

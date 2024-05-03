@@ -1,8 +1,9 @@
 import { FC, MouseEvent } from "react";
-import Folder from "./Folder";
+import SidebarFolder from "./SidebarFolder";
 import { useSelector, useDispatch } from "react-redux";
 import { ExplorerItemsType, MainDataType } from "../Utils/interface";
 import { ChangeRootFolder } from "../redux/storingData";
+import { RiDeleteBin6Fill } from "react-icons/ri";
 
 const SideExplorer: FC = () => {
     const dispatch = useDispatch();
@@ -12,10 +13,14 @@ const SideExplorer: FC = () => {
     );
     const inRecycleBin: boolean = useSelector((state: MainDataType) => state["inRecycleBin"]);
     return (
-        <nav className="border-r-8">
-            <Folder itemId={"0"} item={explorerItems[0]} />
+        <nav className="bg-tertiary flex flex-col w-[390px] h-[78vh] pb-20 pr-1.5 text-quinary">
+            <div className="flex-grow">
+                <SidebarFolder itemId={"0"} item={explorerItems[0]} />
+            </div>
             <div
-                className="cursor-pointer"
+                className={`flex ${
+                    inRecycleBin ? "bg-primary text-quinary" : "text-gray-400"
+                } px-5 mx-10 my-5 pt-3 pb-2.5 cursor-pointer rounded-xl items-center`}
                 onClick={(e: MouseEvent) => {
                     e.stopPropagation();
                     if (!inRecycleBin) {
@@ -24,7 +29,9 @@ const SideExplorer: FC = () => {
                     return;
                 }}
             >
-                🗑️ Recycle Bin {recycleBinItemCount}
+                <RiDeleteBin6Fill className="mr-2 -mt-1" />
+                <span className="flex-grow">Recycle Bin</span>
+                {recycleBinItemCount}
             </div>
         </nav>
     );

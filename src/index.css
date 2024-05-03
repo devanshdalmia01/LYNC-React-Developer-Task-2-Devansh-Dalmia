@@ -1,3 +1,9 @@
+@font-face {
+    font-family: "Gladiora";
+    font-style: normal;
+    font-weight: 400;
+    src: url(/fonts/gladiora-regular.ttf) format("truetype");
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

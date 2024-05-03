@@ -1,17 +1,22 @@
-import { MouseEvent, FC, useState, useEffect } from "react";
+import { MouseEvent, FC, useState, useEffect, ReactElement } from "react";
 import { BUTTONS, MODALS } from "../Utils/enums";
 import { useSelector, useDispatch } from "react-redux";
 import Modal from "./Modal";
-import { MainDataType, ExplorerItemsType, ButtonPropType } from "../Utils/interface";
+import { MainDataType, ExplorerItemsType, ButtonPropType, ActiveFolderType } from "../Utils/interface";
 import { NewFileFolder, DeleteFile, DeleteFolder, RenameFileFolder } from "../redux/storingData";
 import { toast } from "react-toastify";
 import { getErrorMessage } from "../Utils/common";
+import { FaEdit } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+import { AiFillFileAdd, AiFillFolderAdd } from "react-icons/ai";
 
 const Button: FC<ButtonPropType> = ({ type }: ButtonPropType) => {
-    let buttonText: string, modalType: MODALS;
+    let buttonText!: string, modalType!: MODALS, icon!: ReactElement;
     const dispatch = useDispatch();
     const explorerItems: ExplorerItemsType = useSelector((state: MainDataType) => state["explorerItems"]);
-    const currentLocation: string[] = useSelector((state: MainDataType) => state["currentLocation"]);
+    const currentFolder: string | undefined = useSelector(
+        (state: MainDataType) => state["currentPath"].find((item: ActiveFolderType) => item.isActive)?.id
+    );
     const selectedItems: string[] = useSelector((state: MainDataType) => state["selectedItems"]);
     const [accept, setAccept] = useState<boolean>(false);
     const [open, setOpen] = useState<boolean>(false);
@@ -26,7 +31,7 @@ const Button: FC<ButtonPropType> = ({ type }: ButtonPropType) => {
                             NewFileFolder({
                                 name: data as string,
                                 isFolder: BUTTONS.ADD_FILE === type ? false : true,
-                                parentId: currentLocation[currentLocation.length - 1],
+                                parentId: currentFolder as string,
                             })
                         );
                         break;
@@ -63,27 +68,46 @@ const Button: FC<ButtonPropType> = ({ type }: ButtonPropType) => {
         case BUTTONS.ADD_FILE:
             buttonText = "Add File";
             modalType = MODALS.NEW_FILE;
+            icon = <AiFillFileAdd className="-mt-1 text-primary" />;
             break;
         case BUTTONS.ADD_FOLDER:
             buttonText = "Add Folder";
             modalType = MODALS.NEW_FOLDER;
+            icon = <AiFillFolderAdd className="-mt-1 text-primary" />;
             break;
         case BUTTONS.DELETE:
             buttonText = "Delete";
             modalType =
                 selectedItems.length &&
                 (explorerItems[selectedItems[0]].isFolder ? MODALS.DELETE_FOLDER : MODALS.DELETE_FILE);
+            icon = <MdDelete className="-mt-1 text-primary" />;
             break;
         case BUTTONS.RENAME:
             buttonText = "Rename";
             modalType =
                 selectedItems.length &&
                 (explorerItems[selectedItems[0]].isFolder ? MODALS.RENAME_FOLDER : MODALS.RENAME_FILE);
+            icon = <FaEdit className="-mt-1 text-primary" />;
+            break;
+        case BUTTONS.PERMANENT_DELETE:
+            buttonText = "Permanently Delete";
+            modalType =
+                selectedItems.length &&
+                (explorerItems[selectedItems[0]].isFolder
+                    ? MODALS.PERMANENT_DELETE_FOLDER
+                    : MODALS.PERMANENT_DELETE_FILE);
+            icon = <MdDelete className="-mt-1 text-primary" />;
+            break;
+        case BUTTONS.EMPTY_BIN:
+            buttonText = "Empty Bin";
+            modalType = MODALS.EMPTY_BIN;
+            icon = <MdDelete className="-mt-1 text-primary" />;
             break;
     }
     return (
         <>
             <button
+                className="flex items-center bg-quinary border-[1px] border-gray-400 pb-2 pt-2.5 px-6 text-lg font-semibold rounded-full text-tertiary mr-10"
                 onClick={(e: MouseEvent) => {
                     e.preventDefault();
                     if (modalType === MODALS.NULL) {
@@ -95,7 +119,8 @@ const Button: FC<ButtonPropType> = ({ type }: ButtonPropType) => {
                     return;
                 }}
             >
-                {buttonText}
+                {icon}
+                <span className="ml-2">{buttonText}</span>
             </button>
             <Modal open={open} setOpen={setOpen} data={data} setData={setData} setAccept={setAccept} type={modalType} />
         </>

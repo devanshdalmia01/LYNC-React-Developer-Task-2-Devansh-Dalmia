@@ -4,20 +4,21 @@ import {
     NewFileFolderActionPayloadType,
     RenameFileFolderActionPayloadType,
     DeleteRestoreFileFolderActionPayloadType,
+    ExpandCollapseActionPayloadType,
+    ActiveFolderType,
 } from "../Utils/interface";
-import { toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
-
+// TODO Check memory leaks
 const dataSlice = createSlice({
     name: "data",
     initialState: {
         explorerItems: {
-            "0": { name: "🏠 Home", isFolder: true, parentId: "-1", isExpanded: true },
+            "0": { name: "Home", isFolder: true, parentId: "-1", isExpanded: true },
         },
         recycleBinItems: {
-            "0": { name: "🗑️ Recycle Bin", isFolder: true, parentId: "-1" },
+            "0": { name: "Recycle Bin", isFolder: true, parentId: "-1" },
         },
-        currentLocation: ["0"],
+        currentPath: [{ id: "0", isActive: true }],
         selectedItems: [],
         inRecycleBin: false,
     },
@@ -170,12 +171,45 @@ const dataSlice = createSlice({
             state.recycleBinItems = newRecycleBin;
         },
         ChangeRootFolder(state: MainDataType) {
+            state.currentPath = [];
             state.inRecycleBin = !state.inRecycleBin;
         },
         ChangeParent(state, action) {},
-        ChangeCurrentLocation(state, action) {},
+        ChangeCurrentPath(state, action) {},
         SelectFileFolder(state, action) {},
         DeSelectFileFolder(state, action) {},
+        ExpandFolder(state: MainDataType, action: ExpandCollapseActionPayloadType) {
+            const { id }: { id: string } = action.payload;
+            const item = state.explorerItems[id];
+            if (!item) {
+                throw new Error("Folder not found!");
+            }
+            if (!item.isFolder) {
+                throw new Error("Not a folder!");
+            }
+            state.explorerItems[id] = { ...item, isExpanded: true };
+        },
+        CollapseFolder(state: MainDataType, action: ExpandCollapseActionPayloadType) {
+            const { id }: { id: string } = action.payload;
+            const item = state.explorerItems[id];
+            if (!item) {
+                throw new Error("Folder not found!");
+            }
+            if (!item.isFolder) {
+                throw new Error("Not a folder!");
+            }
+            state.explorerItems[id] = { ...item, isExpanded: false };
+        },
+        GoToPreviousFolder(state: MainDataType) {
+            let activePos: number = state.currentPath.findIndex((item: ActiveFolderType) => item.isActive);
+            state.currentPath[activePos].isActive = false;
+            state.currentPath[activePos - 1].isActive = true;
+        },
+        GoToNextFolder(state: MainDataType) {
+            let activePos: number = state.currentPath.findIndex((item: ActiveFolderType) => item.isActive);
+            state.currentPath[activePos].isActive = false;
+            state.currentPath[activePos + 1].isActive = true;
+        },
     },
 });
 
@@ -191,9 +225,13 @@ export const {
     PermanentDeleteFolder,
     ChangeRootFolder,
     ChangeParent,
-    ChangeCurrentLocation,
+    ChangeCurrentPath,
     SelectFileFolder,
     DeSelectFileFolder,
+    ExpandFolder,
+    CollapseFolder,
+    GoToPreviousFolder,
+    GoToNextFolder,
 } = dataSlice.actions;
 
 export default dataSlice.reducer;
