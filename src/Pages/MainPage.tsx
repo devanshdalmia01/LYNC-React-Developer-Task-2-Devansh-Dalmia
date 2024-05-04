@@ -11,6 +11,8 @@ const MainPage: FC = () => {
     const [selectedItem, setSelectedItem] = useState<string>("");
     // TODO useMemo in components not dependent on props & states
     // TODO add 0 items messages
+    // TODO add try catch blocks where dispatch used
+    // TODO return & stoppropogation in clicks
     return (
         <SelectedItem.Provider value={{ selectedItem, setSelectedItem }}>
             <Navbar view={view} setView={setView} />

@@ -5,10 +5,7 @@ export default {
         extend: {
             colors: {
                 primary: "#583DA1",
-                secondary: "#2560A7",
-                tertiary: "#12131A",
-                quaternary: "#FAFAFA",
-                quinary: "#FFFFFF",
+                secondary: "#12131A",
             },
             fontFamily: {
                 sans: ["Gladiora"],

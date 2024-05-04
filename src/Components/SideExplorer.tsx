@@ -13,19 +13,17 @@ const SideExplorer: FC = () => {
     );
     const inRecycleBin: boolean = useSelector((state: MainDataType) => state["inRecycleBin"]);
     return (
-        <nav className="bg-tertiary flex flex-col w-[390px] h-[78vh] overflow-y-scroll pb-20 pr-1.5 text-quinary">
-            <div className="flex-grow">
+        <nav className="bg-secondary flex flex-col w-[390px] h-[78vh] overflow-y-scroll pb-20 pr-1.5 text-white">
+            <div className="flex-grow w-full overflow-x-scroll">
                 <SidebarFolder itemId={"0"} item={explorerItems[0]} />
             </div>
             <div
                 className={`flex ${
-                    inRecycleBin ? "bg-primary text-quinary" : "text-gray-400"
+                    inRecycleBin ? "bg-primary text-white" : "text-gray-400"
                 } px-5 mx-10 my-5 pt-3 pb-2.5 cursor-pointer rounded-xl items-center`}
                 onClick={(e: MouseEvent) => {
                     e.stopPropagation();
-                    if (!inRecycleBin) {
-                        dispatch(ChangeRootFolder());
-                    }
+                    dispatch(ChangeRootFolder({ openRecycleBin: true }));
                     return;
                 }}
             >

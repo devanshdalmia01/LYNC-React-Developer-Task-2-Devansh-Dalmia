@@ -79,7 +79,7 @@ const Modal: FC<ModalPropType> = ({ open, setOpen, data, setData, setAccept, typ
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-1/3 h-72 p-8 rounded-3xl flex flex-col bg-quinary text-black">
+                            <Dialog.Panel className="w-1/3 h-72 p-8 rounded-3xl flex flex-col bg-white text-black">
                                 <div className="flex-grow">
                                     <Dialog.Title as="h1" className={"text-start text-3xl font-bold mb-4"}>
                                         {title}
@@ -105,7 +105,7 @@ const Modal: FC<ModalPropType> = ({ open, setOpen, data, setData, setAccept, typ
                                 </div>
                                 <div className="flex self-end">
                                     <button
-                                        className="flex items-center bg-quinary border-[1px] border-gray-400 pb-2 pt-2.5 px-6 text-lg font-semibold rounded-full text-tertiary mr-5"
+                                        className="flex items-center bg-white border-[1px] border-gray-400 pb-2 pt-2.5 px-6 text-lg font-semibold rounded-full text-secondary mr-5"
                                         onClick={(e: MouseEvent) => {
                                             e.preventDefault();
                                             setOpen(false);
@@ -116,7 +116,7 @@ const Modal: FC<ModalPropType> = ({ open, setOpen, data, setData, setAccept, typ
                                         {rejectButton}
                                     </button>
                                     <button
-                                        className="flex items-center bg-primary border-[1px] pb-2 pt-2.5 px-6 text-lg font-semibold rounded-full text-quinary"
+                                        className="flex items-center bg-primary border-[1px] pb-2 pt-2.5 px-6 text-lg font-semibold rounded-full text-white"
                                         onClick={(e: MouseEvent) => {
                                             e.preventDefault();
                                             setAccept(true);

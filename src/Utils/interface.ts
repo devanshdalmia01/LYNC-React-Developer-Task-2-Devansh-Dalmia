@@ -49,6 +49,7 @@ export interface DeleteRestoreFileFolderActionPayloadType {
 }
 
 export interface ExpandCollapseActionPayloadType extends DeleteRestoreFileFolderActionPayloadType {}
+export interface EnterFolderActionPayloadType extends DeleteRestoreFileFolderActionPayloadType {}
 
 export interface ButtonPropType {
     type: BUTTONS;
@@ -83,4 +84,8 @@ export interface NavbarViewPropType {
 export interface SelectedItemContextType {
     selectedItem: string;
     setSelectedItem: Dispatch<SetStateAction<string>>;
+}
+
+export interface OpenRecycleBinActionPayloadType {
+    payload: { openRecycleBin: boolean };
 }

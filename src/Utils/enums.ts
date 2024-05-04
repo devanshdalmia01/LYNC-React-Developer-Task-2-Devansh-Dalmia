@@ -5,6 +5,7 @@ export enum BUTTONS {
     RENAME,
     PERMANENT_DELETE,
     EMPTY_BIN,
+    RESTORE,
 }
 
 export enum NAV_BUTTONS {

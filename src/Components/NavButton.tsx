@@ -11,19 +11,21 @@ const NavButton: FC<NavButtonPropType> = ({ type }: NavButtonPropType) => {
     switch (type) {
         case NAV_BUTTONS.BACK_BUTTON:
             buttonText = "Go Back";
-            icon = <IoArrowBackCircleSharp className="-mt-1 text-primary" />;
+            icon = <IoArrowBackCircleSharp className="-mt-1 mr-2 text-primary" />;
             break;
         case NAV_BUTTONS.NEXT_BUTTON:
             buttonText = "Go Next";
-            icon = <IoArrowForwardCircleSharp className="-mt-1 text-primary" />;
+            icon = <IoArrowForwardCircleSharp className="-mt-1 ml-2 text-primary" />;
             break;
     }
     return (
         <button
-            className="flex items-center bg-quinary border-[1px] border-gray-400 pb-2 pt-2.5 px-6 text-lg font-semibold rounded-full text-tertiary mr-10"
+            className={`${
+                NAV_BUTTONS.NEXT_BUTTON === type && "ml-auto"
+            } flex items-center bg-white border-[1px] border-gray-400 pb-2 pt-2.5 px-6 text-lg font-semibold rounded-full text-secondary`}
             onClick={(e: MouseEvent) => {
                 e.preventDefault();
-                if (NAV_BUTTONS.BACK_BUTTON) {
+                if (NAV_BUTTONS.BACK_BUTTON === type) {
                     dispatch(GoToPreviousFolder());
                 } else {
                     dispatch(GoToNextFolder());
@@ -31,9 +33,9 @@ const NavButton: FC<NavButtonPropType> = ({ type }: NavButtonPropType) => {
                 return;
             }}
         >
-            {NAV_BUTTONS.BACK_BUTTON && icon}
-            <span className="ml-2">{buttonText}</span>
-            {NAV_BUTTONS.NEXT_BUTTON && icon}
+            {NAV_BUTTONS.BACK_BUTTON === type && icon}
+            {buttonText}
+            {NAV_BUTTONS.NEXT_BUTTON === type && icon}
         </button>
     );
 };

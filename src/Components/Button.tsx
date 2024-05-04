@@ -18,10 +18,12 @@ import {
     EmptyRecycleBin,
     PermanentDeleteFolder,
     PermanentDeleteFile,
+    RestoreFile,
+    RestoreFolder,
 } from "../redux/storingData";
 import { toast } from "react-toastify";
 import { getErrorMessage } from "../Utils/common";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaUndo } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { AiFillFileAdd, AiFillFolderAdd } from "react-icons/ai";
 import { SelectedItem } from "../Utils/context";
@@ -69,6 +71,11 @@ const Button: FC<ButtonPropType> = ({ type }: ButtonPropType) => {
                         recycleBinItems[selectedItem].isFolder
                             ? dispatch(PermanentDeleteFolder({ id: selectedItem }))
                             : dispatch(PermanentDeleteFile({ id: selectedItem }));
+                        break;
+                    case BUTTONS.RESTORE:
+                        recycleBinItems[selectedItem].isFolder
+                            ? dispatch(RestoreFolder({ id: selectedItem }))
+                            : dispatch(RestoreFile({ id: selectedItem }));
                         break;
                     case BUTTONS.EMPTY_BIN:
                         dispatch(EmptyRecycleBin());
@@ -131,6 +138,10 @@ const Button: FC<ButtonPropType> = ({ type }: ButtonPropType) => {
                     : MODALS.NULL;
             icon = <MdDelete className="-mt-1 text-primary" />;
             break;
+        case BUTTONS.RESTORE:
+            buttonText = "Restore";
+            icon = <FaUndo className="-mt-1 text-primary" />;
+            break;
         case BUTTONS.EMPTY_BIN:
             buttonText = "Empty Bin";
             modalType = MODALS.EMPTY_BIN;
@@ -140,10 +151,12 @@ const Button: FC<ButtonPropType> = ({ type }: ButtonPropType) => {
     return (
         <>
             <button
-                className="flex items-center bg-quinary border-[1px] border-gray-400 pb-2 pt-2.5 px-6 text-lg font-semibold rounded-full text-tertiary mr-10"
+                className="flex items-center bg-white border-[1px] border-gray-400 pb-2 pt-2.5 px-6 text-lg font-semibold rounded-full text-secondary mr-10"
                 onClick={(e: MouseEvent) => {
                     e.preventDefault();
-                    if (modalType === MODALS.NULL) {
+                    if (BUTTONS.RESTORE === type) {
+                        setAccept(true);
+                    } else if (modalType === MODALS.NULL) {
                         setOpen(false);
                         toast.error("Please select a file/folder first!");
                     } else {
@@ -155,7 +168,16 @@ const Button: FC<ButtonPropType> = ({ type }: ButtonPropType) => {
                 {icon}
                 <span className="ml-2">{buttonText}</span>
             </button>
-            <Modal open={open} setOpen={setOpen} data={data} setData={setData} setAccept={setAccept} type={modalType} />
+            {BUTTONS.RESTORE !== type && (
+                <Modal
+                    open={open}
+                    setOpen={setOpen}
+                    data={data}
+                    setData={setData}
+                    setAccept={setAccept}
+                    type={modalType}
+                />
+            )}
         </>
     );
 };

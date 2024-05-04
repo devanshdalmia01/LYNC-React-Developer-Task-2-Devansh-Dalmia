@@ -3,7 +3,7 @@ import { FileFolderPropType } from "../Utils/interface";
 import SidebarFile from "./SidebarFile";
 import { ExplorerItemsType, MainDataType, ActiveFolderType } from "../Utils/interface";
 import { useSelector, useDispatch } from "react-redux";
-import { ChangeRootFolder, ExpandFolder, CollapseFolder } from "../redux/storingData";
+import { ChangeRootFolder, ExpandFolder, CollapseFolder, EnterFolderFromSidebar } from "../redux/storingData";
 import { FaFolder, FaCaretDown, FaCaretRight } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { getErrorMessage } from "../Utils/common";
@@ -30,42 +30,46 @@ const SidebarFolder: FC<FileFolderPropType> = ({ itemId, item }: FileFolderPropT
             {/* TODO call expand/collapse function */}
             <div
                 className={`flex ${
-                    currentFolder === itemId || !inRecycleBin ? "bg-primary text-quinary" : "text-gray-400"
+                    currentFolder === itemId && !inRecycleBin ? "bg-primary text-white" : "text-gray-400"
                 } px-5 mx-10 my-5 pt-3 pb-2.5 rounded-xl cursor-pointer items-center`}
-                onClick={(e: MouseEvent) => {
+                onDoubleClickCapture={(e: MouseEvent) => {
                     e.stopPropagation();
-                    if (inRecycleBin && itemId === "0") {
-                        dispatch(ChangeRootFolder());
+                    try {
+                        if (itemId === "0") {
+                            dispatch(ChangeRootFolder({ openRecycleBin: false }));
+                        } else {
+                            item.isFolder
+                                ? dispatch(EnterFolderFromSidebar({ id: itemId }))
+                                : toast.error("Double click on file is not supported");
+                        }
+                    } catch (error) {
+                        toast.error(getErrorMessage(error));
                     }
                     return;
                 }}
             >
                 <FaFolder className="mr-2 -mt-1" /> <span className="flex-grow">{item.name}</span>
-                {item.isExpanded ? (
-                    <FaCaretDown
-                        className="-mt-1.5"
-                        onClick={(e: MouseEvent) => {
-                            e.preventDefault();
-                            try {
-                                dispatch(ExpandFolder({ id: itemId }));
-                            } catch (error) {
-                                toast.error(getErrorMessage(error));
-                            }
-                        }}
-                    />
-                ) : (
-                    <FaCaretRight
-                        className="-mt-1.5"
-                        onClick={(e: MouseEvent) => {
-                            e.preventDefault();
-                            try {
+                <button
+                    onClick={(e: MouseEvent) => {
+                        e.stopPropagation();
+                        try {
+                            if (item.isExpanded) {
                                 dispatch(CollapseFolder({ id: itemId }));
-                            } catch (error) {
-                                toast.error(getErrorMessage(error));
+                            } else {
+                                dispatch(ExpandFolder({ id: itemId }));
                             }
-                        }}
-                    />
-                )}
+                        } catch (error) {
+                            toast.error(getErrorMessage(error));
+                        }
+                        return;
+                    }}
+                >
+                    {item.isExpanded ? (
+                        <FaCaretDown className="-mt-1.5 h-[30px] text-xl" />
+                    ) : (
+                        <FaCaretRight className="-mt-1.5 h-[30px] text-xl" />
+                    )}
+                </button>
             </div>
             {item.isExpanded &&
                 sortedChildren.length > 0 &&

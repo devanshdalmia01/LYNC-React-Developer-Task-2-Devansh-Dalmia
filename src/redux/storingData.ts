@@ -6,6 +6,8 @@ import {
     DeleteRestoreFileFolderActionPayloadType,
     ExpandCollapseActionPayloadType,
     ActiveFolderType,
+    EnterFolderActionPayloadType,
+    OpenRecycleBinActionPayloadType,
 } from "../Utils/interface";
 import { v4 as uuidv4 } from "uuid";
 
@@ -166,11 +168,46 @@ const dataSlice = createSlice({
             recursiveDelete(id);
             state.recycleBinItems = newRecycleBin;
         },
-        ChangeRootFolder(state: MainDataType) {
-            state.inRecycleBin = !state.inRecycleBin;
+        ChangeRootFolder(state: MainDataType, action: OpenRecycleBinActionPayloadType) {
+            if (action.payload.openRecycleBin) {
+                state.inRecycleBin = true;
+                state.currentPath = [];
+            } else {
+                state.currentPath = [{ id: "0", isActive: true }];
+                state.inRecycleBin = false;
+            }
         },
-        ChangeParent(state, action) {},
-        ChangeCurrentPath(state, action) {},
+        EnterFolder(state: MainDataType, action: EnterFolderActionPayloadType) {
+            const { id }: { id: string } = action.payload;
+            const checkInPath: number = state.currentPath.findIndex((item: ActiveFolderType) => item.id === id);
+            const activePos: number = state.currentPath.findIndex((item: ActiveFolderType) => item.isActive);
+            if (checkInPath !== -1) {
+                state.currentPath[checkInPath].isActive = true;
+            } else {
+                state.currentPath = state.currentPath.slice(0, activePos + 1);
+                state.currentPath.push({ id, isActive: true });
+            }
+            state.currentPath[activePos].isActive = false;
+        },
+        EnterFolderFromSidebar(state: MainDataType, action: EnterFolderActionPayloadType) {
+            const { id }: { id: string } = action.payload;
+            state.currentPath = [{ id: "0", isActive: false }];
+            let parentId: string = id;
+            let temp: ActiveFolderType[] = [];
+            while (parentId !== "0") {
+                temp.push({
+                    id: parentId,
+                    isActive: false,
+                });
+                parentId = state.explorerItems[parentId].parentId;
+            }
+            for (let index: number = temp.length - 1; index >= 0; index--) {
+                if (index === 0) {
+                    temp[index].isActive = true;
+                }
+                state.currentPath.push(temp[index]);
+            }
+        },
         ExpandFolder(state: MainDataType, action: ExpandCollapseActionPayloadType) {
             const { id }: { id: string } = action.payload;
             const item = state.explorerItems[id];
@@ -217,8 +254,8 @@ export const {
     PermanentDeleteFile,
     PermanentDeleteFolder,
     ChangeRootFolder,
-    ChangeParent,
-    ChangeCurrentPath,
+    EnterFolder,
+    EnterFolderFromSidebar,
     ExpandFolder,
     CollapseFolder,
     GoToPreviousFolder,

@@ -13,21 +13,21 @@ const MainExplorer: FC<ViewPropType> = ({ view }: ViewPropType) => {
     const inRecycleBin: boolean = useSelector((state: MainDataType) => state["inRecycleBin"]);
     const activePos: number = currentPath.findIndex((item: ActiveFolderType) => item.isActive);
     return (
-        <main className="bg-quaternary w-[74vw] h-[82.5vh] pt-8 overflow-y-scroll">
+        <main className="bg-gray-50 w-[74vw] h-[82.5vh] overflow-y-scroll">
             {!inRecycleBin && (
-                <div className="flex">
-                    <div className="flex-grow">
+                <div className="flex sticky top-0 bg-gray-50 py-8">
+                    <div className="flex-grow flex mx-10">
                         {activePos != 0 && <NavButton type={NAV_BUTTONS.BACK_BUTTON} />}
                         {activePos != currentPath.length - 1 && <NavButton type={NAV_BUTTONS.NEXT_BUTTON} />}
                     </div>
                     <div className="flex">
-                        <Button type={BUTTONS.ADD_FILE} />
-                        <Button type={BUTTONS.ADD_FOLDER} />
+                        <Button type={BUTTONS.RENAME} />
+                        <Button type={BUTTONS.DELETE} />
                     </div>
                 </div>
             )}
             <div
-                className={`mt-8 ml-10 ${
+                className={`ml-10 ${inRecycleBin && "mt-10"} ${
                     view === VIEW.GRID ? "grid grid-cols-5 space-y-reverse space-y-5 pb-5" : "flex flex-col pb-5"
                 }`}
             >
