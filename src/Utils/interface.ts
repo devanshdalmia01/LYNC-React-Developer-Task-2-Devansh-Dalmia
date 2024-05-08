@@ -1,91 +1,103 @@
-import { BUTTONS, MODALS, NAV_BUTTONS, VIEW } from "./enums";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, ReactElement, MouseEvent } from "react";
+import { SORT_ORDER, SORT_TYPE, TYPE_FILTER, VIEW, MODALS } from "./enums";
 
 export interface FileFolderType {
-    name: string;
-    isFolder: boolean;
-    parentId: string;
-    isExpanded?: boolean;
-}
-
-export interface ExplorerItemsType {
-    [key: string]: FileFolderType;
-}
-
-export interface ActiveFolderType {
     id: string;
-    isActive: boolean;
+    name: string;
+    isFolder: number;
+    parentLineage: string[];
+    isExpanded: boolean;
+    parentId: string;
+    lastModifiedTime: Date;
+    childrenCount: number;
+    size: number;
 }
 
-export interface RecycleBinItemsType extends ExplorerItemsType {}
-
-export interface MainDataType {
-    explorerItems: ExplorerItemsType;
-    recycleBinItems: RecycleBinItemsType;
-    currentPath: ActiveFolderType[];
-    inRecycleBin: boolean;
+export interface SelectedItem {
+    id: string;
+    name: string;
+    isFolder: number;
 }
 
-export interface FileFolderPropType {
-    itemId: string;
-    item: FileFolderType;
+export interface SelectedItemContextType extends SelectedItem {
+    setId: Dispatch<SetStateAction<string>>;
+    setName: Dispatch<SetStateAction<string>>;
+    setIsFolder: Dispatch<SetStateAction<number>>;
 }
 
-export interface NewFileFolderActionPayloadType {
-    payload: FileFolderType;
-}
-
-export interface RenameFileFolderActionPayloadType {
-    payload: {
-        id: string;
-        newName: string;
-    };
-}
-
-export interface DeleteRestoreFileFolderActionPayloadType {
-    payload: {
-        id: string;
-    };
-}
-
-export interface ExpandCollapseActionPayloadType extends DeleteRestoreFileFolderActionPayloadType {}
-export interface EnterFolderActionPayloadType extends DeleteRestoreFileFolderActionPayloadType {}
-
-export interface ButtonPropType {
-    type: BUTTONS;
-}
-
-export interface NavButtonPropType {
-    type: NAV_BUTTONS;
-}
-
-export interface ModalPropType {
-    open: boolean;
-    setOpen: Dispatch<SetStateAction<boolean>>;
-    data: string;
-    setData: Dispatch<SetStateAction<string>>;
-    setAccept: Dispatch<SetStateAction<boolean>>;
+export interface ModalContextType {
+    isOpen: boolean;
     type: MODALS;
+    data: string | File;
+    acceptPressed: boolean;
+    openModal: (type: MODALS, data?: string) => void;
+    closeModal: () => void;
+    setType: Dispatch<SetStateAction<MODALS>>;
+    setData: (data: string | File) => void;
+    setAcceptPressed: Dispatch<SetStateAction<boolean>>;
 }
 
-export interface MainAreaFileFolderPropType extends FileFolderPropType {
+export interface ViewTypeFilterSortOrderContextType {
     view: VIEW;
-}
-
-export interface ViewPropType {
-    view: VIEW;
-}
-
-export interface NavbarViewPropType {
-    view: VIEW;
+    typeFilter: TYPE_FILTER;
+    sort: SORT_TYPE;
+    order: SORT_ORDER;
     setView: Dispatch<SetStateAction<VIEW>>;
+    setTypeFilter: Dispatch<SetStateAction<TYPE_FILTER>>;
+    setSort: Dispatch<SetStateAction<SORT_TYPE>>;
+    setOrder: Dispatch<SetStateAction<SORT_ORDER>>;
 }
 
-export interface SelectedItemContextType {
-    selectedItem: string;
-    setSelectedItem: Dispatch<SetStateAction<string>>;
+export interface CurrentLocationContextType {
+    activePosition: number;
+    currentPath: string[];
+    setActivePosition: Dispatch<SetStateAction<number>>;
+    setCurrentPath: Dispatch<SetStateAction<string[]>>;
 }
 
-export interface OpenRecycleBinActionPayloadType {
-    payload: { openRecycleBin: boolean };
+export interface FileFoldersContextType {
+    GetMainData: (data: {
+        parentId: string;
+        sort: SORT_TYPE;
+        type: TYPE_FILTER;
+        order: SORT_ORDER;
+    }) => Promise<FileFolderType[]>;
+    AddNewFileFolder: (data: FileFolderType) => Promise<void>;
+    RenameFileFolder: (data: { id: string; name: string }) => Promise<void>;
+    DeleteFileFolder: (data: { id: string }) => Promise<void>;
+}
+
+export interface RecycleBinContextType {
+    inRecycleBin: boolean;
+    setInRecycleBin: Dispatch<SetStateAction<boolean>>;
+    GetRecycleBinCount: () => Promise<number>;
+    RestoreFileFolder: (data: { id: string }) => Promise<void>;
+    PermanentlyDeleteFileFolder: (data: { id: string }) => Promise<void>;
+    EmptyRecycleBin: () => Promise<void>;
+}
+
+export interface ProviderType {
+    children: ReactElement | ReactElement[];
+}
+
+export interface ModalConfig {
+    title: string;
+    description: string;
+    rejectButton: string;
+    acceptButton: string;
+}
+
+export interface ButtonConfig {
+    text: string;
+    className: string;
+    conditionalClassName: string;
+    icon: ReactElement;
+}
+
+export interface DoubleClickDivPropType {
+    singleClick: (item: SelectedItem, e: MouseEvent<Element>) => void;
+    doubleClick: (item: SelectedItem, e: MouseEvent<Element>) => void;
+    className: string;
+    children: ReactElement[];
+    item: SelectedItem;
 }

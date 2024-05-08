@@ -1,63 +1,170 @@
-import { FC, ChangeEvent, MouseEvent, Fragment } from "react";
-import { Dialog, Transition } from "@headlessui/react";
-import { ModalPropType } from "../Utils/interface";
-import { MODALS } from "../Utils/enums";
+import { FC, ChangeEvent, MouseEvent, Fragment, useEffect, useRef } from "react";
+import { Dialog, DialogPanel, DialogTitle, Description, Transition, TransitionChild } from "@headlessui/react";
+import { MODALS, ModalInfo } from "../Utils/enums";
+import { v4 as uuidv4 } from "uuid";
+import { toast } from "react-toastify";
+import { getErrorMessage } from "../Utils/common";
+import { useParams } from "react-router-dom";
+import { useFileFolders, useRecycleBin, useSelectedItem, useModal } from "../Utils/customHooks";
 
-const Modal: FC<ModalPropType> = ({ open, setOpen, data, setData, setAccept, type }: ModalPropType) => {
-    let title!: string, description!: string, rejectButton!: string, acceptButton!: string;
-    switch (type) {
-        case MODALS.DELETE_FILE:
-        case MODALS.DELETE_FOLDER:
-            title = `Delete ${type === MODALS.DELETE_FOLDER ? "Folder" : "File"}`;
-            description = `Do you want to send this ${
-                type === MODALS.DELETE_FOLDER ? "folder" : "file"
-            } to Recycle Bin?`;
-            rejectButton = "No";
-            acceptButton = "Yes";
-            break;
-        case MODALS.NEW_FILE:
-        case MODALS.NEW_FOLDER:
-            title = `Create New ${type === MODALS.NEW_FOLDER ? "Folder" : "File"}`;
-            description = `Enter name of the ${type === MODALS.NEW_FOLDER ? "folder" : "file"}`;
-            rejectButton = "Cancel";
-            acceptButton = "Create";
-            break;
-        case MODALS.PERMANENT_DELETE_FILE:
-        case MODALS.PERMANENT_DELETE_FOLDER:
-            title = `Permanently Delete ${type === MODALS.PERMANENT_DELETE_FOLDER ? "Folder" : "File"}`;
-            description = `Do you want to permanently delete this ${
-                type === MODALS.PERMANENT_DELETE_FOLDER ? "folder" : "file"
-            }?`;
-            rejectButton = "No";
-            acceptButton = "Yes";
-            break;
-        case MODALS.RENAME_FILE:
-        case MODALS.RENAME_FOLDER:
-            title = `Rename ${type === MODALS.RENAME_FOLDER ? "Folder" : "File"}`;
-            description = `Enter new name of the ${type === MODALS.RENAME_FOLDER ? "Folder" : "File"}`;
-            rejectButton = "Cancel";
-            acceptButton = "Change";
-            break;
-        case MODALS.EMPTY_BIN:
-            title = "Empty Bin";
-            description = "Do you want to empty Recycle Bin?";
-            rejectButton = "No";
-            acceptButton = "Yes";
-            break;
-    }
+const Modal: FC = () => {
+    const fileUploadRef = useRef<HTMLInputElement>(null);
+    const { "*": splat } = useParams();
+    const { AddNewFileFolder, RenameFileFolder, DeleteFileFolder } = useFileFolders();
+    const { PermanentlyDeleteFileFolder, EmptyRecycleBin, RestoreFileFolder } = useRecycleBin();
+    const { isOpen, type, data, acceptPressed, setData, closeModal, setAcceptPressed } = useModal();
+    const { id, setId, setIsFolder, setName } = useSelectedItem();
+    const handleAccept = async () => {
+        if (acceptPressed) {
+            let path: string[] = splat?.split("/").map((value) => value) as string[];
+            switch (type) {
+                case MODALS.NEW_FILE:
+                    AddNewFileFolder({
+                        id: uuidv4(),
+                        name: data as string,
+                        isFolder: 0,
+                        parentId: path[path.length - 1],
+                        parentLineage: path,
+                        isExpanded: false,
+                        lastModifiedTime: new Date(),
+                        childrenCount: 0,
+                        size: 0,
+                    })
+                        .then(() => closeModal())
+                        .catch((error) => {
+                            toast.error(getErrorMessage(error));
+                            setAcceptPressed(false);
+                        });
+                    break;
+                case MODALS.NEW_FOLDER:
+                    AddNewFileFolder({
+                        id: uuidv4(),
+                        name: data as string,
+                        isFolder: 1,
+                        parentId: path[path.length - 1],
+                        parentLineage: path,
+                        isExpanded: true,
+                        lastModifiedTime: new Date(),
+                        childrenCount: 0,
+                        size: 0,
+                    })
+                        .then(() => closeModal())
+                        .catch((error) => {
+                            toast.error(getErrorMessage(error));
+                            setAcceptPressed(false);
+                        });
+                    break;
+                case MODALS.RENAME_FILE:
+                case MODALS.RENAME_FOLDER:
+                    RenameFileFolder({
+                        id: id,
+                        name: data as string,
+                    })
+                        .then(() => {
+                            setId("");
+                            setIsFolder(0);
+                            setName("");
+                            closeModal();
+                        })
+                        .catch((error) => {
+                            toast.error(getErrorMessage(error));
+                            setAcceptPressed(false);
+                        });
+                    break;
+                case MODALS.DELETE_FILE:
+                case MODALS.DELETE_FOLDER:
+                    DeleteFileFolder({
+                        id: id,
+                    })
+                        .catch((error) => {
+                            toast.error(getErrorMessage(error));
+                        })
+                        .finally(() => {
+                            setId("");
+                            setIsFolder(0);
+                            setName("");
+                            closeModal();
+                        });
+                    break;
+                case MODALS.PERMANENT_DELETE_FILE:
+                case MODALS.PERMANENT_DELETE_FOLDER:
+                    PermanentlyDeleteFileFolder({
+                        id: id,
+                    })
+                        .catch((error) => {
+                            toast.error(getErrorMessage(error));
+                        })
+                        .finally(() => {
+                            setId("");
+                            setIsFolder(0);
+                            setName("");
+                            closeModal();
+                        });
+                    break;
+                case MODALS.EMPTY_BIN:
+                    EmptyRecycleBin()
+                        .catch((error) => {
+                            toast.error(getErrorMessage(error));
+                        })
+                        .finally(() => {
+                            closeModal();
+                        });
+                    break;
+                case MODALS.NULL:
+                    RestoreFileFolder({
+                        id: id,
+                    })
+                        .catch((error) => toast.error(getErrorMessage(error)))
+                        .finally(() => {
+                            setId("");
+                            setIsFolder(0);
+                            setName("");
+                            setAcceptPressed(false);
+                        });
+                    break;
+                case MODALS.UPLOAD_FILE:
+                    AddNewFileFolder({
+                        id: uuidv4(),
+                        name: data instanceof File ? data.name : "",
+                        isFolder: 0,
+                        parentId: path[path.length - 1],
+                        parentLineage: path,
+                        isExpanded: false,
+                        lastModifiedTime: data instanceof File ? new Date(data.lastModified) : new Date(),
+                        childrenCount: 0,
+                        size: data instanceof File ? data.size : 0,
+                    })
+                        .then(() => closeModal())
+                        .catch((error) => {
+                            toast.error(getErrorMessage(error));
+                            setAcceptPressed(false);
+                        });
+                    break;
+            }
+        }
+    };
+    useEffect(() => {
+        handleAccept();
+    }, [acceptPressed]);
+    if (!isOpen) return null;
+    if (type === MODALS.NULL) return null;
+    const { title, description, rejectButton, acceptButton } = ModalInfo[type];
     return (
-        <Transition appear show={open} as={Fragment}>
+        <Transition appear show={isOpen} as={Fragment}>
             <Dialog
                 as="div"
                 className="relative z-50"
-                open={open}
+                open={isOpen}
                 onClose={() => {
-                    setOpen(false);
-                    setData("");
-                    setAccept(false);
+                    closeModal();
+                }}
+                onFocus={() => {
+                    if (type === MODALS.UPLOAD_FILE && data instanceof File && data.name.length === 0) {
+                        fileUploadRef.current?.click();
+                    }
                 }}
             >
-                <Transition.Child
+                <TransitionChild
                     as={Fragment}
                     enter="ease-out duration-300"
                     enterFrom="opacity-0"
@@ -67,10 +174,10 @@ const Modal: FC<ModalPropType> = ({ open, setOpen, data, setData, setAccept, typ
                     leaveTo="opacity-0"
                 >
                     <div className="fixed inset-0 bg-black/25" />
-                </Transition.Child>
+                </TransitionChild>
                 <div className="fixed inset-0 overflow-y-auto">
                     <div className="flex min-h-full items-center justify-center p-4 text-center">
-                        <Transition.Child
+                        <TransitionChild
                             as={Fragment}
                             enter="ease-out duration-300"
                             enterFrom="opacity-0 scale-95"
@@ -79,27 +186,42 @@ const Modal: FC<ModalPropType> = ({ open, setOpen, data, setData, setAccept, typ
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-1/3 h-72 p-8 rounded-3xl flex flex-col bg-white text-black">
+                            <DialogPanel className="w-1/3 h-72 p-8 rounded-3xl flex flex-col bg-white text-black">
                                 <div className="flex-grow">
-                                    <Dialog.Title as="h1" className={"text-start text-3xl font-bold mb-4"}>
+                                    <DialogTitle as="h1" className={"text-start text-3xl font-bold mb-4"}>
                                         {title}
-                                    </Dialog.Title>
-                                    <Dialog.Description className={"text-start text-lg font-medium"}>
+                                    </DialogTitle>
+                                    <Description className={"text-start text-lg font-medium"}>
                                         {description}
-                                    </Dialog.Description>
-                                    {/* TODO Check empty name */}
+                                    </Description>
                                     {(type === MODALS.NEW_FILE ||
                                         type === MODALS.NEW_FOLDER ||
                                         type === MODALS.RENAME_FILE ||
                                         type === MODALS.RENAME_FOLDER) && (
                                         <input
-                                            value={data}
+                                            data-autofocus
+                                            value={data as string}
                                             onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                                e.stopPropagation();
                                                 e.preventDefault();
                                                 setData(e.target.value);
                                             }}
                                             type="text"
-                                            className="mt-2.5 block focus:outline-none w-full rounded-md border-[1px] border-gray-400 px-3 py-2 text-gray-900"
+                                            className="mt-2.5 w-full rounded-md border-[1px] border-gray-400 px-3 py-2 text-gray-900"
+                                        />
+                                    )}
+                                    {type === MODALS.UPLOAD_FILE && (
+                                        <input
+                                            ref={fileUploadRef}
+                                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                                e.stopPropagation();
+                                                e.preventDefault();
+                                                if (e.target.files) {
+                                                    setData(e.target.files[0]);
+                                                }
+                                            }}
+                                            type="file"
+                                            className="mt-2.5 w-full rounded-md border-[1px] border-gray-400 px-3 py-2 text-gray-900"
                                         />
                                     )}
                                 </div>
@@ -107,10 +229,10 @@ const Modal: FC<ModalPropType> = ({ open, setOpen, data, setData, setAccept, typ
                                     <button
                                         className="flex items-center bg-white border-[1px] border-gray-400 pb-2 pt-2.5 px-6 text-lg font-semibold rounded-full text-secondary mr-5"
                                         onClick={(e: MouseEvent) => {
+                                            e.stopPropagation();
                                             e.preventDefault();
-                                            setOpen(false);
-                                            setData("");
-                                            setAccept(false);
+                                            closeModal();
+                                            return;
                                         }}
                                     >
                                         {rejectButton}
@@ -118,15 +240,17 @@ const Modal: FC<ModalPropType> = ({ open, setOpen, data, setData, setAccept, typ
                                     <button
                                         className="flex items-center bg-primary border-[1px] pb-2 pt-2.5 px-6 text-lg font-semibold rounded-full text-white"
                                         onClick={(e: MouseEvent) => {
+                                            e.stopPropagation();
                                             e.preventDefault();
-                                            setAccept(true);
+                                            setAcceptPressed(true);
+                                            return;
                                         }}
                                     >
                                         {acceptButton}
                                     </button>
                                 </div>
-                            </Dialog.Panel>
-                        </Transition.Child>
+                            </DialogPanel>
+                        </TransitionChild>
                     </div>
                 </div>
             </Dialog>

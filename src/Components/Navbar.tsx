@@ -1,101 +1,48 @@
-import { FC, MouseEvent, ReactElement } from "react";
+import { FC } from "react";
 import Logo from "../Assets/file-explorer-logo.webp";
 import { Link } from "react-router-dom";
+import Breadcrumb from "./Breadcrumb";
+import { useRecycleBin } from "../Utils/customHooks";
 import Button from "./Button";
-import { useSelector, useDispatch } from "react-redux";
-import { MainDataType, ExplorerItemsType, ActiveFolderType, NavbarViewPropType } from "../Utils/interface";
-import { FaChevronRight } from "react-icons/fa";
-import { BUTTONS, VIEW } from "../Utils/enums";
-import { TiHome } from "react-icons/ti";
-import { TbLayoutGrid, TbLayoutList } from "react-icons/tb";
-import { GoToPreviousFolder, ChangeRootFolder } from "../redux/storingData";
+import { BUTTONS } from "../Utils/enums";
 
-const Navbar: FC<NavbarViewPropType> = ({ view, setView }: NavbarViewPropType) => {
-    const dispatch = useDispatch();
-    const explorerItems: ExplorerItemsType = useSelector((state: MainDataType) => state["explorerItems"]);
-    const currentPath: ActiveFolderType[] = useSelector((state: MainDataType) => state["currentPath"]);
-    const inRecycleBin: boolean = useSelector((state: MainDataType) => state["inRecycleBin"]);
-    const elements: ReactElement[] = [];
-    for (let index: number = 0; index < currentPath.length; index++) {
-        const item: ActiveFolderType = currentPath[index];
-        elements.push(
-            <div
-                key={index}
-                className="flex items-center"
-                onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    if (index === 0) {
-                        dispatch(ChangeRootFolder({ openRecycleBin: false }));
-                    } else if (index < currentPath.length) {
-                        for (let i = 0; i < currentPath.length - 1 - index; i++) {
-                            dispatch(GoToPreviousFolder());
-                        }
-                    }
-                    return;
-                }}
-            >
-                {index === 0 && <TiHome className="-mt-1 text-2xl mr-1.5" />}
-                {!(index === 0) && <FaChevronRight className="mx-[4px]" />}
-                <button className="text-2xl font-semibold">{explorerItems[item.id].name.slice(0, 5)}</button>
-            </div>
-        );
-
-        if (item.isActive) break;
-    }
+const Navbar: FC = () => {
+    const { inRecycleBin } = useRecycleBin();
     return (
         <header className="flex">
-            <section className="">
-                <Link className="-ml-3 -mt-3 -mb-3 pr-8 flex bg-secondary text-white items-center" to="/">
+            <section>
+                <Link className="-ml-3 -mt-3 pr-8 flex bg-secondary text-white items-center" to="/">
                     <img className="w-[175px]" src={Logo} alt="App Logo" />
-                    <div className="flex-col">
-                        <h1 className="text-4xl font-black no-underline">File Explorer</h1>
-                        <sub className="text-lg align-top float-end">by Devansh</sub>
+                    <div>
+                        <h1 className="text-4xl font-extrabold">File Explorer</h1>
+                        <sub className="text-lg float-end">by Devansh</sub>
                     </div>
                 </Link>
             </section>
-            <section className="ml-5 flex items-center flex-grow">
-                {!inRecycleBin ? elements : <div className="text-4xl font-extrabold mt-4">🗑️ Recycle Bin</div>}
+            <section className="ml-5 flex flex-grow w-[22%] items-center overflow-x-scroll">
+                {!inRecycleBin ? (
+                    <div className="flex items-center">
+                        <Breadcrumb />
+                    </div>
+                ) : (
+                    <div className="text-4xl font-extrabold mt-2">🗑️ Recycle Bin</div>
+                )}
             </section>
-            <section className="flex items-center mr-10 w-[92px]">
-                <div className="flex justify-between border-[1px] border-gray-400 rounded-full w-full">
-                    <button
-                        className={`w-[46px] focus:outline-none h-[46px] flex items-center justify-center rounded-full ${
-                            view === VIEW.GRID && "bg-primary"
-                        }`}
-                        onClick={(e: MouseEvent) => {
-                            e.preventDefault();
-                            setView(VIEW.GRID);
-                            return;
-                        }}
-                    >
-                        <TbLayoutGrid className={`${view === VIEW.GRID ? "text-white" : "text-gray-400"} text-xl`} />
-                    </button>
-                    <button
-                        className={`w-[46px] focus:outline-none h-[46px] flex items-center justify-center rounded-full ${
-                            view === VIEW.LIST && "bg-primary"
-                        }`}
-                        onClick={(e: MouseEvent) => {
-                            e.preventDefault();
-                            setView(VIEW.LIST);
-                            return;
-                        }}
-                    >
-                        <TbLayoutList className={`${view === VIEW.LIST ? "text-white" : "text-gray-400"} text-xl`} />
-                    </button>
+            <section className="flex items-center mr-3 w-[10%]">
+                <div className="flex flex-grow justify-evenly mr-3">
+                    <Button type={!inRecycleBin ? BUTTONS.RENAME_BUTTON : BUTTONS.RESTORE_BUTTON} />
+                    <Button type={!inRecycleBin ? BUTTONS.DELETE_BUTTON : BUTTONS.PERMANENT_DELETE_BUTTON} />
                 </div>
             </section>
             <section className="flex items-center">
                 {!inRecycleBin ? (
                     <>
-                        <Button type={BUTTONS.ADD_FILE} />
-                        <Button type={BUTTONS.ADD_FOLDER} />
+                        <Button type={BUTTONS.UPLOAD_FILE_BUTTON} />
+                        <Button type={BUTTONS.NEW_FILE_BUTTON} />
+                        <Button type={BUTTONS.NEW_FOLDER_BUTTON} />
                     </>
                 ) : (
-                    <>
-                        <Button type={BUTTONS.RESTORE} />
-                        <Button type={BUTTONS.PERMANENT_DELETE} />
-                        <Button type={BUTTONS.EMPTY_BIN} />
-                    </>
+                    <Button type={BUTTONS.EMPTY_BIN_BUTTON} />
                 )}
             </section>
         </header>

@@ -1,15 +1,21 @@
 import { FC } from "react";
-import { BrowserRouter, Route, Routes as RouterRoutes } from "react-router-dom";
-import MainPage from "./Pages/MainPage";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Home from "./Pages/Home";
+import NotFoundPage from "./Pages/NotFoundPage";
+import { Navigate } from "react-router-dom";
 
-const Routes: FC = () => {
+const AppRoutes: FC = () => {
     return (
         <BrowserRouter>
-            <RouterRoutes>
-                <Route path="/" element={<MainPage />} />
-            </RouterRoutes>
+            <Routes>
+                <Route path="/" element={<Navigate replace to="/folders/0" />} />
+                <Route path="/recyclebin" element={<Home />} />
+                <Route path="/folders" element={<Navigate replace to="/folders/0" />} />
+                <Route path="/folders/*" element={<Home />} />
+                <Route path="*" element={<NotFoundPage />} />
+            </Routes>
         </BrowserRouter>
     );
 };
 
-export default Routes;
+export default AppRoutes;

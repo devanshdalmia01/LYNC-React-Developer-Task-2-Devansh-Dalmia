@@ -1,21 +1,22 @@
-import { FC, MouseEvent } from "react";
-import SidebarFolder from "./SidebarFolder";
-import { useSelector, useDispatch } from "react-redux";
-import { ExplorerItemsType, MainDataType } from "../Utils/interface";
-import { ChangeRootFolder } from "../redux/storingData";
+import { FC, MouseEvent, useEffect, useState } from "react";
+import SidebarItem from "./SidebarItem";
 import { RiDeleteBin6Fill } from "react-icons/ri";
+import { useModal, useRecycleBin, useSelectedItem } from "../Utils/customHooks";
+import { useNavigate } from "react-router-dom";
 
 const SideExplorer: FC = () => {
-    const dispatch = useDispatch();
-    const explorerItems: ExplorerItemsType = useSelector((state: MainDataType) => state["explorerItems"]);
-    const recycleBinItemCount: number = useSelector(
-        (state: MainDataType) => Object.values(state["recycleBinItems"]).length
-    );
-    const inRecycleBin: boolean = useSelector((state: MainDataType) => state["inRecycleBin"]);
+    const navigate = useNavigate();
+    const { GetRecycleBinCount, inRecycleBin } = useRecycleBin();
+    const [recycleBinItemCount, setRecycleBinItemCount] = useState<number>();
+    const { acceptPressed } = useModal();
+    const { id } = useSelectedItem();
+    useEffect(() => {
+        GetRecycleBinCount().then((value) => setRecycleBinItemCount(value));
+    }, [acceptPressed, id]);
     return (
         <nav className="bg-secondary flex flex-col w-[390px] h-[78vh] overflow-y-scroll pb-20 pr-1.5 text-white">
-            <div className="flex-grow w-full overflow-x-scroll">
-                <SidebarFolder itemId={"0"} item={explorerItems[0]} />
+            <div className="flex-grow mt-5 w-full overflow-x-scroll">
+                <SidebarItem id="0" />
             </div>
             <div
                 className={`flex ${
@@ -23,7 +24,8 @@ const SideExplorer: FC = () => {
                 } px-5 mx-10 my-5 pt-3 pb-2.5 cursor-pointer rounded-xl items-center`}
                 onClick={(e: MouseEvent) => {
                     e.stopPropagation();
-                    dispatch(ChangeRootFolder({ openRecycleBin: true }));
+                    e.preventDefault();
+                    navigate("/recyclebin");
                     return;
                 }}
             >
