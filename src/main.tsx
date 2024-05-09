@@ -8,19 +8,29 @@ import {
     FileFoldersProvider,
     RecycleBinProvider,
     CurrentLocationProvider,
-} from "./Utils/provider";
-import "react-toastify/dist/ReactToastify.css";
-import "./index.css";
+} from "./Context/provider";
+import "react-toastify/dist/ReactToastify.css"; // Styles for Toast notifications
+import "./index.css"; // Global styles
 
+// Create the root of the application and attach it to the DOM element with the id 'root'
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <>
+        {/* Wrapping all components inside various context providers to manage global state */}
+        {/* Provider for managing file and folder data and operations */}
         <FileFoldersProvider>
+            {/* Provider for managing the current navigational path */}
             <CurrentLocationProvider>
+                {/* Provider for managing the state of the currently selected item */}
                 <SelectedItemProvider>
+                    {/* Provider for managing the state related to the recycle bin */}
                     <RecycleBinProvider>
+                        {/* Provider for managing filters and sort options */}
                         <ViewTypeFilterSortProvider>
+                            {/* Provider for handling modals throughout the application */}
                             <ModalProvider>
+                                {/* Main routing setup of the application */}
                                 <Routes />
+                                {/* Toast notifications container with configurations */}
                                 <ToastContainer
                                     theme="colored"
                                     position="bottom-center"

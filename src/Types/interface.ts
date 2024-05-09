@@ -1,42 +1,47 @@
 import { Dispatch, SetStateAction, ReactElement, MouseEvent } from "react";
 import { SORT_ORDER, SORT_TYPE, TYPE_FILTER, VIEW, MODALS } from "./enums";
 
+// Interface representing the structure of a file or folder.
 export interface FileFolderType {
-    id: string;
-    name: string;
-    isFolder: number;
-    parentLineage: string[];
-    isExpanded: boolean;
-    parentId: string;
-    lastModifiedTime: Date;
-    childrenCount: number;
-    size: number;
+    id: string;  // Unique identifier for the file or folder
+    name: string;  // Display name of the file or folder
+    isFolder: number;  // Flag indicating if it's a folder (e.g., 1 for folder, 0 for file)
+    parentLineage: string[];  // Array of parent ids showing the path to this item
+    isExpanded: boolean;  // State of folder expansion in UI
+    parentId: string;  // Id of the parent folder
+    lastModifiedTime: Date;  // Timestamp of the last modification
+    childrenCount: number;  // Number of items inside the folder
+    size: number;  // Size of the file in bytes
 }
 
+// Interface for an item selected by the user.
 export interface SelectedItem {
-    id: string;
-    name: string;
-    isFolder: number;
+    id: string;  // Unique identifier for the selected item
+    name: string;  // Name of the selected item
+    isFolder: number;  // Indicates if the selected item is a folder
 }
 
+// Context type for managing the state of a selected item.
 export interface SelectedItemContextType extends SelectedItem {
     setId: Dispatch<SetStateAction<string>>;
     setName: Dispatch<SetStateAction<string>>;
     setIsFolder: Dispatch<SetStateAction<number>>;
 }
 
+// Context for managing modal dialogs within the application.
 export interface ModalContextType {
-    isOpen: boolean;
-    type: MODALS;
-    data: string | File;
-    acceptPressed: boolean;
-    openModal: (type: MODALS, data?: string) => void;
-    closeModal: () => void;
+    isOpen: boolean;  // Indicates if a modal is open
+    type: MODALS;  // Type of the modal to display
+    data: string | File;  // Data associated with the modal
+    acceptPressed: boolean;  // Flag indicating if the accept button was pressed
+    openModal: (type: MODALS, data?: string) => void;  // Function to open modal
+    closeModal: () => void;  // Function to close modal
     setType: Dispatch<SetStateAction<MODALS>>;
     setData: (data: string | File) => void;
     setAcceptPressed: Dispatch<SetStateAction<boolean>>;
 }
 
+// Context for controlling view settings, type filters, and sorting.
 export interface ViewTypeFilterSortOrderContextType {
     view: VIEW;
     typeFilter: TYPE_FILTER;
@@ -48,13 +53,15 @@ export interface ViewTypeFilterSortOrderContextType {
     setOrder: Dispatch<SetStateAction<SORT_ORDER>>;
 }
 
+// Context for managing the current location within the application's navigation.
 export interface CurrentLocationContextType {
-    activePosition: number;
-    currentPath: string[];
+    activePosition: number;  // Active index in the navigation path
+    currentPath: string[];  // Array of strings representing the path
     setActivePosition: Dispatch<SetStateAction<number>>;
     setCurrentPath: Dispatch<SetStateAction<string[]>>;
 }
 
+// Context for managing file and folder operations.
 export interface FileFoldersContextType {
     GetMainData: (data: {
         parentId: string;
@@ -67,8 +74,9 @@ export interface FileFoldersContextType {
     DeleteFileFolder: (data: { id: string }) => Promise<void>;
 }
 
+// Context for managing the recycle bin's functionalities.
 export interface RecycleBinContextType {
-    inRecycleBin: boolean;
+    inRecycleBin: boolean;  // Flag indicating if the current view is recycle bin
     setInRecycleBin: Dispatch<SetStateAction<boolean>>;
     GetRecycleBinCount: () => Promise<number>;
     RestoreFileFolder: (data: { id: string }) => Promise<void>;
@@ -76,10 +84,12 @@ export interface RecycleBinContextType {
     EmptyRecycleBin: () => Promise<void>;
 }
 
+// Props type for providers, supporting multiple children.
 export interface ProviderType {
     children: ReactElement | ReactElement[];
 }
 
+// Configuration for modal dialogs.
 export interface ModalConfig {
     title: string;
     description: string;
@@ -87,6 +97,7 @@ export interface ModalConfig {
     acceptButton: string;
 }
 
+// Configuration for buttons with dynamic styles.
 export interface ButtonConfig {
     text: string;
     className: string;
@@ -94,6 +105,7 @@ export interface ButtonConfig {
     icon: ReactElement;
 }
 
+// Prop types for components handling double-click and single-click actions.
 export interface DoubleClickDivPropType {
     singleClick: (item: SelectedItem, e: MouseEvent<Element>) => void;
     doubleClick: (item: SelectedItem, e: MouseEvent<Element>) => void;

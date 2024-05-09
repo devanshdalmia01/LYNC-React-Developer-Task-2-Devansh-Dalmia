@@ -1,11 +1,11 @@
 import { FC, ChangeEvent, MouseEvent, Fragment, useEffect, useRef } from "react";
 import { Dialog, DialogPanel, DialogTitle, Description, Transition, TransitionChild } from "@headlessui/react";
-import { MODALS, ModalInfo } from "../Utils/enums";
+import { MODALS, ModalInfo } from "../Types/enums";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
-import { getErrorMessage } from "../Utils/common";
+import { getErrorMessage } from "../Utils/helper";
 import { useParams } from "react-router-dom";
-import { useFileFolders, useRecycleBin, useSelectedItem, useModal } from "../Utils/customHooks";
+import { useFileFolders, useRecycleBin, useSelectedItem, useModal } from "../Hooks/hooks";
 
 const Modal: FC = () => {
     const fileUploadRef = useRef<HTMLInputElement>(null);

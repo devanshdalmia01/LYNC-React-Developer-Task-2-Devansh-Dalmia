@@ -7,7 +7,7 @@ const NotFoundPage: FC = memo(() => {
         <div className="h-screen flex flex-col items-center justify-center">
             <img className="mb-10" width="400px" src={Image_404} alt="404_1" />
             <img className="mt-5" width="400px" src={Image_404_Text} alt="404_2" />
-            <p className="pt-5">If you are hiring, do give a chance to interview and show my potential!💯 </p>
+            <p className="pt-5">If you are hiring, do give a chance to interview and show my potential!💯</p>
         </div>
     );
 });

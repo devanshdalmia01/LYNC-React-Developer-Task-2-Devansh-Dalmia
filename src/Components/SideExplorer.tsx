@@ -1,7 +1,7 @@
 import { FC, MouseEvent, useEffect, useState } from "react";
 import SidebarItem from "./SidebarItem";
 import { RiDeleteBin6Fill } from "react-icons/ri";
-import { useModal, useRecycleBin, useSelectedItem } from "../Utils/customHooks";
+import { useModal, useRecycleBin, useSelectedItem } from "../Hooks/hooks";
 import { useNavigate } from "react-router-dom";
 
 const SideExplorer: FC = () => {
@@ -21,7 +21,7 @@ const SideExplorer: FC = () => {
             <div
                 className={`flex ${
                     inRecycleBin ? "bg-primary text-white" : "text-gray-400"
-                } px-5 mx-10 my-5 pt-3 pb-2.5 cursor-pointer rounded-xl items-center`}
+                } px-4 mx-2 pt-3 pb-2.5 rounded-xl cursor-pointer items-center`}
                 onClick={(e: MouseEvent) => {
                     e.stopPropagation();
                     e.preventDefault();

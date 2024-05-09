@@ -1,11 +1,12 @@
 import { useState, FC } from "react";
-import { ProviderType, FileFolderType } from "./interface";
+import { ProviderType, FileFolderType } from "../Types/interface";
 import { SelectedItem, Modal, FileFolders, RecycleBin, ViewTypeFilterSort, CurrentLocation } from "./context";
-import { db } from "./db";
-import { SORT_TYPE, SORT_ORDER, TYPE_FILTER, VIEW, MODALS } from "./enums";
-import { fetchData, getErrorMessage } from "./common";
+import { db } from "../Utils/db";
+import { SORT_TYPE, SORT_ORDER, TYPE_FILTER, VIEW, MODALS } from "../Types/enums";
+import { fetchData, getErrorMessage } from "../Utils/helper";
 import { toast } from "react-toastify";
 
+// Provides context for the selected item within the application.
 export const SelectedItemProvider: FC<ProviderType> = ({ children }) => {
     const [id, setId] = useState<string>("");
     const [name, setName] = useState<string>("");
@@ -26,22 +27,28 @@ export const SelectedItemProvider: FC<ProviderType> = ({ children }) => {
     );
 };
 
+// Provides context for handling modal dialog states and interactions.
 export const ModalProvider: FC<ProviderType> = ({ children }) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [type, setType] = useState<MODALS>(MODALS.NULL);
     const [data, setData] = useState<string | File>("");
     const [acceptPressed, setAcceptPressed] = useState<boolean>(false);
+
+    // Function to handle opening modals with appropriate data and type.
     const openModal = (modalType: MODALS, data?: string) => {
         setType(modalType);
         setData(data || "");
         setIsOpen(true);
     };
+
+    // Function to handle the closure of modals and reset associated state.
     const closeModal = () => {
         setIsOpen(false);
         setType(MODALS.NULL);
         setData("");
         setAcceptPressed(false);
     };
+
     return (
         <Modal.Provider
             value={{
@@ -61,11 +68,13 @@ export const ModalProvider: FC<ProviderType> = ({ children }) => {
     );
 };
 
+// Provides context for managing view settings like sorting and filtering.
 export const ViewTypeFilterSortProvider: FC<ProviderType> = ({ children }) => {
     const [view, setView] = useState<VIEW>(VIEW.GRID);
     const [typeFilter, setTypeFilter] = useState<TYPE_FILTER>(TYPE_FILTER.FILE_FOLDER);
     const [sort, setSort] = useState<SORT_TYPE>(SORT_TYPE.NAME);
     const [order, setOrder] = useState<SORT_ORDER>(SORT_ORDER.ASCENDING);
+
     return (
         <ViewTypeFilterSort.Provider
             value={{
@@ -84,9 +93,11 @@ export const ViewTypeFilterSortProvider: FC<ProviderType> = ({ children }) => {
     );
 };
 
+// Provides context for tracking and managing the current location within the application.
 export const CurrentLocationProvider: FC<ProviderType> = ({ children }) => {
     const [activePosition, setActivePosition] = useState<number>(0);
     const [currentPath, setCurrentPath] = useState<string[]>(["0"]);
+
     return (
         <CurrentLocation.Provider
             value={{
@@ -101,7 +112,9 @@ export const CurrentLocationProvider: FC<ProviderType> = ({ children }) => {
     );
 };
 
+// Provides context for interacting with the file system managed in an IndexedDB.
 export const FileFoldersProvider: FC<ProviderType> = ({ children }) => {
+    // Dynamically fetches data based on sorting, filtering, and parent directory.
     const GetMainData = async (data: {
         parentId: string;
         sort: SORT_TYPE;
@@ -125,7 +138,10 @@ export const FileFoldersProvider: FC<ProviderType> = ({ children }) => {
             throw new Error(getErrorMessage(error));
         }
     };
+
+    // Function to handle adding a new file or folder, checking for duplicates and existence of parent.
     const AddNewFileFolder = async (data: FileFolderType) => {
+        // Check for an existing item with the same name in the same directory.
         const existingItem = await db.filesAndFolders.get({
             name: data.name,
             parentId: data.parentId,
@@ -136,15 +152,15 @@ export const FileFoldersProvider: FC<ProviderType> = ({ children }) => {
             throw new Error(`${data.isFolder ? "Folder" : "File"} with this name already exists!`);
         }
 
+        // Ensure the parent directory exists before adding a new item.
         const parentFolder = await db.filesAndFolders.get(data.parentId);
-
         if (!parentFolder) {
             throw new Error(`Parent folder doesn't exist!`);
         }
 
         try {
+            // Add the new item and update the parent's child count and last modified time.
             await db.filesAndFolders.add(data, data.id);
-
             const updatedChildrenCount = (parentFolder.childrenCount ?? 0) + 1;
             await db.filesAndFolders.update(data.parentId, {
                 childrenCount: updatedChildrenCount,
@@ -154,6 +170,8 @@ export const FileFoldersProvider: FC<ProviderType> = ({ children }) => {
             throw new Error("Failed to add or update file/folder due to an internal error.");
         }
     };
+
+    // Handles renaming of files and folders, checking for conflicts in names.
     const RenameFileFolder = async (data: { id: string; name: string }) => {
         const dbData = await db.filesAndFolders.get(data.id);
 
@@ -161,6 +179,7 @@ export const FileFoldersProvider: FC<ProviderType> = ({ children }) => {
             throw new Error("Folder/File doesn't exist!");
         }
 
+        // Check if there's already a file or folder with the new name in the same directory.
         const existingItem = await db.filesAndFolders.get({
             name: data.name,
             parentId: dbData.parentId,
@@ -171,8 +190,11 @@ export const FileFoldersProvider: FC<ProviderType> = ({ children }) => {
             throw new Error(`${dbData.isFolder ? "Folder" : "File"} with this name already exists!`);
         }
 
+        // Update the name and last modified time of the item.
         await db.filesAndFolders.update(data.id, { name: data.name, lastModifiedTime: new Date() });
     };
+
+    // Function to handle moving an item to the recycle bin.
     const DeleteFileFolder = async (data: { id: string }) => {
         const itemToDelete = await db.filesAndFolders.get(data.id);
 
@@ -181,6 +203,7 @@ export const FileFoldersProvider: FC<ProviderType> = ({ children }) => {
         }
 
         try {
+            // Move the item to the recycle bin and update the parent's child count.
             await db.recycleBin.add(
                 {
                     ...itemToDelete,
@@ -190,6 +213,7 @@ export const FileFoldersProvider: FC<ProviderType> = ({ children }) => {
                 itemToDelete.id
             );
 
+            // Delete the original item and update the parent's children count if necessary.
             await db.filesAndFolders.delete(data.id);
 
             if (itemToDelete.parentId !== "-1") {
@@ -206,6 +230,7 @@ export const FileFoldersProvider: FC<ProviderType> = ({ children }) => {
             throw new Error("Failed to delete the item due to an internal error.");
         }
     };
+
     return (
         <FileFolders.Provider
             value={{
@@ -220,10 +245,14 @@ export const FileFoldersProvider: FC<ProviderType> = ({ children }) => {
     );
 };
 
+// Provides context for managing the recycle bin, including restoration and deletion of items.
 export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
     const [inRecycleBin, setInRecycleBin] = useState<boolean>(false);
+
+    // Permanently deletes an item from the recycle bin.
     const PermanentlyDeleteFileFolder = async (data: { id: string }) => {
         try {
+            // Perform transactional deletion, ensuring that all references are removed.
             await db.transaction("rw", [db.recycleBin, db.filesAndFolders], async () => {
                 const item = await db.recycleBin.get(data.id);
                 if (!item) {
@@ -232,6 +261,7 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
 
                 await db.recycleBin.delete(data.id);
 
+                // Also delete any children of the deleted item.
                 const childrenIds = await db.filesAndFolders.where({ parentId: data.id }).primaryKeys();
                 if (childrenIds.length > 0) {
                     await db.filesAndFolders.bulkDelete(childrenIds);
@@ -241,6 +271,8 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
             throw new Error("Failed to perform delete operations due to an internal error.");
         }
     };
+
+    // Restores an item from the recycle bin to its last known parent, or to "Home" if the parent no longer exists.
     const RestoreFileFolder = async (data: { id: string }) => {
         try {
             const itemToRestore = await db.recycleBin.get(data.id);
@@ -248,47 +280,52 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
                 throw new Error("Folder/File doesn't exist in the recycle bin!");
             }
 
-            if (!itemToRestore.parentLineage || itemToRestore.parentLineage.length === 0) {
-                throw new Error("No valid parent information available to restore the item.");
-            }
-
+            // Verify the parent exists or reset to "Home".
             const lastKnownParentId = itemToRestore.parentLineage[itemToRestore.parentLineage.length - 1];
+            const parentFolder = await db.filesAndFolders.get(lastKnownParentId);
 
-            const parentExists = await db.filesAndFolders.get(lastKnownParentId);
-
-            if (!parentExists) {
+            // If the original parent doesn't exist anymore, reset to "Home"
+            if (!parentFolder) {
                 toast.warning('Parent directory does not exist. Restoring to "Home".');
                 itemToRestore.parentId = "0";
                 itemToRestore.parentLineage = ["0"];
-                itemToRestore.lastModifiedTime = new Date();
             } else {
                 itemToRestore.parentId = lastKnownParentId;
-                itemToRestore.lastModifiedTime = new Date();
             }
 
+            itemToRestore.lastModifiedTime = new Date();
+
+            // Transactionally restore the item and update the parent
             await db.transaction("rw", [db.filesAndFolders, db.recycleBin], async () => {
-                await db.filesAndFolders.add({
-                    ...itemToRestore,
-                });
+                // Add the item back to files/folders
+                await db.filesAndFolders.add(itemToRestore);
+                // Remove the item from the recycle bin
                 await db.recycleBin.delete(data.id);
+
+                // Update parent folder's children count and last modified time
+                const updatedChildrenCount = (parentFolder?.childrenCount ?? 0) + 1;
+                await db.filesAndFolders.update(parentFolder?.id, {
+                    childrenCount: updatedChildrenCount,
+                    lastModifiedTime: new Date(),
+                });
             });
         } catch (error) {
             throw new Error("Failed to restore due to an internal error.");
         }
     };
+
+    // Empties all items from the recycle bin.
     const EmptyRecycleBin = async () => {
         try {
+            // Clear all items in the recycle bin.
             await db.transaction("rw", [db.recycleBin, db.filesAndFolders], async () => {
                 const keys = await db.recycleBin.where({ parentId: "-1" }).primaryKeys();
-
                 await db.recycleBin.bulkDelete(keys);
 
-                for (const key of keys) {
-                    await db.filesAndFolders.where({ parentId: key }).delete();
-                }
-
+                // Optionally clear all items if the parent folder is "Home" and it's empty.
                 if (!(await db.filesAndFolders.where({ parentId: "0" }).count())) {
                     await db.filesAndFolders.clear();
+                    // Re-add the "Home" folder if it was removed.
                     await db.filesAndFolders.add({
                         id: "0",
                         name: "Home",
@@ -306,6 +343,8 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
             throw new Error("Failed to perform operations due to an internal error.");
         }
     };
+
+    // Retrieves the count of items in the recycle bin.
     const GetRecycleBinCount = async () => {
         try {
             return await db.recycleBin.where({ parentId: "-1" }).count();
@@ -313,6 +352,7 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
             throw new Error("Failed to retrieve recycle bin count due to an internal error.");
         }
     };
+
     return (
         <RecycleBin.Provider
             value={{

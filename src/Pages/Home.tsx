@@ -1,17 +1,18 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, MouseEvent, lazy } from "react";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
-import Modal from "../Components/Modal";
+const Modal = lazy(() => import("../Components/Modal"));
 import SideExplorer from "../Components/SideExplorer";
 import MainItems from "../Components/MainItems";
 import { useParams, useLocation } from "react-router-dom";
-import { useCurrentLocation, useRecycleBin } from "../Utils/customHooks";
+import { useCurrentLocation, useRecycleBin, useSelectedItem } from "../Hooks/hooks";
 
 const Home: FC = () => {
     const location = useLocation();
     const { "*": splat } = useParams();
     const { inRecycleBin, setInRecycleBin } = useRecycleBin();
     const { setActivePosition, setCurrentPath } = useCurrentLocation();
+    const { setId, setIsFolder, setName } = useSelectedItem();
     useEffect(() => {
         if (location.pathname === "/recyclebin" && !inRecycleBin) {
             setInRecycleBin(true);
@@ -29,7 +30,17 @@ const Home: FC = () => {
             <Navbar />
             <section className="flex">
                 <SideExplorer />
-                <main className="bg-gray-50 pt-7 w-[74vw] h-[82.5vh] overflow-y-scroll">
+                <main
+                    className="bg-gray-50 pt-5 w-[74vw] h-[82.5vh] overflow-y-scroll"
+                    onClick={(e: MouseEvent) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        setId("");
+                        setIsFolder(0);
+                        setName("");
+                        return;
+                    }}
+                >
                     <MainItems />
                 </main>
             </section>

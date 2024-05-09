@@ -1,9 +1,9 @@
-import { MouseEvent, FC } from "react";
+import { MouseEvent, FC, memo } from "react";
 import { TbLayoutGrid, TbLayoutList } from "react-icons/tb";
-import { VIEW } from "../Utils/enums";
-import { useViewTypeFilterSort } from "../Utils/customHooks";
+import { VIEW } from "../Types/enums";
+import { useViewTypeFilterSort } from "../Hooks/hooks";
 
-const GridButton: FC<{ type: VIEW }> = ({ type }) => {
+const GridButton: FC<{ type: VIEW }> = memo(({ type }) => {
     const { view, setView } = useViewTypeFilterSort();
     return (
         <button
@@ -24,6 +24,6 @@ const GridButton: FC<{ type: VIEW }> = ({ type }) => {
             )}
         </button>
     );
-};
+});
 
 export default GridButton;

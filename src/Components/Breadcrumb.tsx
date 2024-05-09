@@ -1,12 +1,12 @@
-import { MouseEvent, FC, Fragment, useState, useEffect } from "react";
+import { MouseEvent, FC, Fragment, useState, useEffect, memo } from "react";
 import { FaChevronRight } from "react-icons/fa";
 import { TiHome } from "react-icons/ti";
-import { useCurrentLocation } from "../Utils/customHooks";
+import { useCurrentLocation } from "../Hooks/hooks";
 import { db } from "../Utils/db";
 import { useNavigate } from "react-router-dom";
-import { computePath } from "../Utils/common";
+import { memoizedComputePath } from "../Utils/helper";
 
-const Breadcrumb: FC = () => {
+const Breadcrumb: FC = memo(() => {
     const navigate = useNavigate();
     const [names, setNames] = useState<string[]>([""]);
     const { activePosition, currentPath } = useCurrentLocation();
@@ -35,7 +35,7 @@ const Breadcrumb: FC = () => {
                         onClick={(e: MouseEvent) => {
                             e.stopPropagation();
                             e.preventDefault();
-                            navigate(computePath(index, currentPath));
+                            navigate(memoizedComputePath(index, currentPath));
                             return;
                         }}
                     >
@@ -45,6 +45,6 @@ const Breadcrumb: FC = () => {
             )
         );
     });
-};
+});
 
 export default Breadcrumb;

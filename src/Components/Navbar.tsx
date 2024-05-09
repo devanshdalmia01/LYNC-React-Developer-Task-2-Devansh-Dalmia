@@ -1,18 +1,18 @@
-import { FC } from "react";
+import { FC, memo } from "react";
 import Logo from "../Assets/file-explorer-logo.webp";
 import { Link } from "react-router-dom";
 import Breadcrumb from "./Breadcrumb";
-import { useRecycleBin } from "../Utils/customHooks";
+import { useRecycleBin } from "../Hooks/hooks";
 import Button from "./Button";
-import { BUTTONS } from "../Utils/enums";
+import { BUTTONS } from "../Types/enums";
 
-const Navbar: FC = () => {
+const Navbar: FC = memo(() => {
     const { inRecycleBin } = useRecycleBin();
     return (
         <header className="flex">
             <section>
                 <Link className="-ml-3 -mt-3 pr-8 flex bg-secondary text-white items-center" to="/">
-                    <img className="w-[175px]" src={Logo} alt="App Logo" />
+                    <img width="175px" src={Logo} alt="App Logo" />
                     <div>
                         <h1 className="text-4xl font-extrabold">File Explorer</h1>
                         <sub className="text-lg float-end">by Devansh</sub>
@@ -47,6 +47,6 @@ const Navbar: FC = () => {
             </section>
         </header>
     );
-};
+});
 
 export default Navbar;

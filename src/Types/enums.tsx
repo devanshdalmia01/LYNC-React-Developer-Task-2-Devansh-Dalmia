@@ -3,28 +3,33 @@ import { FaEdit, FaFileUpload, FaUndo } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { AiFillFolderAdd, AiFillFileAdd } from "react-icons/ai";
 
+// Enum to define different views such as grid and list.
 export enum VIEW {
     GRID,
     LIST,
 }
 
+// Enum to filter by file type, either files or folders, or both.
 export enum TYPE_FILTER {
     FILE_FOLDER,
     FOLDER,
     FILE,
 }
 
+// Enum to specify sorting criteria for file and folder listings.
 export enum SORT_TYPE {
     NAME = "name",
     DATE_MODIFIED = "lastModifiedTime",
     SIZE = "size",
 }
 
+// Enum for sorting order, either ascending or descending.
 export enum SORT_ORDER {
     ASCENDING,
     DESCENDING,
 }
 
+// Enum defining the types of modals that can be used in the application.
 export enum MODALS {
     NEW_FILE,
     NEW_FOLDER,
@@ -36,9 +41,10 @@ export enum MODALS {
     PERMANENT_DELETE_FOLDER,
     EMPTY_BIN,
     UPLOAD_FILE,
-    NULL,
+    NULL, // Represents no modal
 }
 
+// Enum for different button types in the UI, defining their functional context.
 export enum BUTTONS {
     UPLOAD_FILE_BUTTON,
     NEW_FILE_BUTTON,
@@ -54,6 +60,7 @@ export enum BUTTONS {
     RESTORE_OPTION_BUTTON,
 }
 
+// Configuration objects for each type of modal dialog used in the application.
 export const ModalInfo: Record<MODALS, ModalConfig> = {
     [MODALS.DELETE_FILE]: {
         title: "Delete File",
@@ -123,6 +130,7 @@ export const ModalInfo: Record<MODALS, ModalConfig> = {
     },
 };
 
+// CSS classes for different types of buttons used throughout the application.
 const buttonWithTextClass: string =
     "flex justify-center items-center w-[150px] bg-white border-[1px] border-gray-400 pb-2 pt-2.5 px-3 text-lg font-semibold rounded-full text-secondary mr-3";
 const buttonWithTextIconClass: string = "text-xl -mt-1 text-primary";
@@ -132,6 +140,7 @@ const buttonWithOnlyIcon: string =
 const optionButtonClass: string = "group flex w-full pl-2 text-center items-center gap-2 py-1 px-1 hover:bg-gray-100";
 const optionButtonIconClass: string = "-mt-1 text-primary";
 
+// Configuration objects for each type of button in the application.
 export const ButtonInfo: Record<BUTTONS, ButtonConfig> = {
     [BUTTONS.UPLOAD_FILE_BUTTON]: {
         text: "Upload File",

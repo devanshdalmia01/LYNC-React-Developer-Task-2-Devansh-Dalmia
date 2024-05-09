@@ -1,6 +1,6 @@
 import { FC, MouseEvent } from "react";
-import { BUTTONS, ButtonInfo, MODALS } from "../Utils/enums";
-import { useModal, useSelectedItem } from "../Utils/customHooks";
+import { BUTTONS, ButtonInfo, MODALS } from "../Types/enums";
+import { useModal, useSelectedItem } from "../Hooks/hooks";
 
 const Button: FC<{ type: BUTTONS }> = ({ type }) => {
     const { id, isFolder, name } = useSelectedItem();
@@ -48,6 +48,7 @@ const Button: FC<{ type: BUTTONS }> = ({ type }) => {
                 e.stopPropagation();
                 e.preventDefault();
                 handleClick(e);
+                return;
             }}
         >
             {icon}
