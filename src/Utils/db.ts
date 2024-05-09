@@ -28,7 +28,6 @@ db.transaction("rw", [db.filesAndFolders, db.recycleBin], async () => {
             id: "0", // Unique identifier for the Home folder.
             name: "Home", // Name of the folder.
             isFolder: 1, // Indicates this entry is a folder.
-            isExpanded: true, // Initial state, expanded.
             parentLineage: [], // An empty array since 'Home' has no parents.
             parentId: "-2", // Parent Id, indicating no parent.
             childrenCount: 0, // Initially, no children.
@@ -44,7 +43,6 @@ db.transaction("rw", [db.filesAndFolders, db.recycleBin], async () => {
             id: "-1", // Unique identifier for the Recycle Bin.
             name: "Recycle Bin", // Name of the folder.
             isFolder: 1, // Indicates this entry is a folder.
-            isExpanded: false, // Initial state, not expanded.
             parentLineage: [], // An empty array since 'Recycle Bin' has no parents.
             parentId: "-2", // Parent Id, indicating no parent.
             childrenCount: 0, // Initially, no children.

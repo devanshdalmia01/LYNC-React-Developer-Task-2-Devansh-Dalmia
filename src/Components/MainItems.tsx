@@ -19,32 +19,33 @@ import OptionButton from "./OptionButton";
 const MainItems: FC = () => {
     const navigate = useNavigate();
 
-    const [recycleBinItemCount, setRecycleBinItemCount] = useState<number>();
+    // State for children data
     const [childrenData, setChildrenData] = useState<FileFolderType[]>([]);
 
+    // Hooks
     const { view, order, sort, typeFilter } = useViewTypeFilterSort();
     const { acceptPressed } = useModal();
-    const { inRecycleBin, GetRecycleBinCount } = useRecycleBin();
+    const { inRecycleBin } = useRecycleBin();
     const { id, setId, setName, setIsFolder } = useSelectedItem();
     const { activePosition, currentPath } = useCurrentLocation();
     const { GetMainData } = useFileFolders();
 
+    // Fetch children data based on filters
     useEffect(() => {
         GetMainData({ parentId: currentPath[activePosition], order: order, sort: sort, type: typeFilter }).then(
             (result) => {
                 setChildrenData(result);
             }
         );
+        // Reset selected item if no children data
         if (!childrenData.length) {
             setId("");
             setName("");
             setIsFolder(0);
         }
-    }, [acceptPressed, inRecycleBin, activePosition, currentPath, recycleBinItemCount]);
-    useEffect(() => {
-        GetRecycleBinCount().then((value) => setRecycleBinItemCount(value));
-    }, [acceptPressed, id]);
+    }, [acceptPressed, currentPath, order, sort, typeFilter]);
 
+    // Handle double click event
     const onDoubleClick = (item: { id: string; name: string; isFolder: number }, e: MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
@@ -63,6 +64,8 @@ const MainItems: FC = () => {
             toast.error("Opening a file is not supported, yet!");
         }
     };
+
+    // Handle single click event
     const onSingleClick = (item: { id: string; name: string; isFolder: number }, e: MouseEvent, from?: string) => {
         e.stopPropagation();
         if (item.id === id && !from) {
@@ -77,26 +80,33 @@ const MainItems: FC = () => {
     };
 
     return !(childrenData.length > 0) ? (
+        // Render if no data
         <div className="w-full h-[50vh] flex items-center justify-center">
             <h1 className="text-3xl font-bold text-primary">No file or folders added!</h1>
         </div>
     ) : (
+        // Render if data exists
         <>
             <div className="flex justify-around sticky top-0 mb-5 bg-gray-50">
+                {/* View buttons */}
                 <div className="flex w-[96px] justify-between border-[1px] gray-400 rounded-full">
                     <GridButton type={VIEW.GRID} />
                     <GridButton type={VIEW.LIST} />
                 </div>
             </div>
+            {/* Render based on view type */}
             {view === VIEW.LIST ? (
+                // Render as list
                 <>
                     <div className="ml-12 mb-3 flex">
+                        {/* Headers */}
                         <div className="w-[6%] text-center text-xl font-semibold border-r-[1px]">Type</div>
                         <div className="w-[40%] text-center text-xl font-semibold border-r-[1px]">Name</div>
                         <div className="w-[20%] text-center text-xl font-semibold border-r-[1px]">Size/Items Count</div>
                         <div className="w-[24%] text-center text-xl font-semibold border-r-[1px]">Last Modified</div>
                         <div className="w-[8%] invisible" />
                     </div>
+                    {/* Render items */}
                     {childrenData.map((item: FileFolderType) => {
                         return (
                             <DoubleClickDiv
@@ -108,6 +118,7 @@ const MainItems: FC = () => {
                                 }`}
                                 key={item.id}
                             >
+                                {/* Item details */}
                                 <div className="w-[6%] text-center text-primary text-2xl font-semibold border-r-[1px]">
                                     {item.isFolder ? <FaFolder className="ml-5" /> : <FaFile className="ml-5" />}
                                 </div>
@@ -125,6 +136,7 @@ const MainItems: FC = () => {
                                     {memoizedGetDate(item.lastModifiedTime)}
                                 </div>
                                 <div className="w-[8%] flex items-center justify-center">
+                                    {/* Option button */}
                                     <OptionButton onSingleClick={onSingleClick} item={item} />
                                 </div>
                             </DoubleClickDiv>
@@ -132,11 +144,14 @@ const MainItems: FC = () => {
                     })}
                 </>
             ) : (
+                // Render as grid
                 <div className="ml-10 grid grid-cols-5 space-y-reverse space-y-5 pb-5">
+                    {/* Render items */}
                     {childrenData.map((item: FileFolderType) => {
                         return (
                             <div className="flex" key={item.id}>
                                 <div className="relative right-8 top-4 z-50 h-0 order-2">
+                                    {/* Option button */}
                                     <OptionButton onSingleClick={onSingleClick} item={item} />
                                 </div>
                                 <DoubleClickDiv

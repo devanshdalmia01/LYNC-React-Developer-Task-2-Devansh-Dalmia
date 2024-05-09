@@ -6,45 +6,52 @@ import { db } from "../Utils/db";
 import { useNavigate } from "react-router-dom";
 import { memoizedComputePath } from "../Utils/helper";
 
+// Memoized Breadcrumb component to prevent re-renders unless necessary
 const Breadcrumb: FC = memo(() => {
     const navigate = useNavigate();
-    const [names, setNames] = useState<string[]>([""]);
+
     const { activePosition, currentPath } = useCurrentLocation();
+
+    const [names, setNames] = useState<string[]>([]);
+
+    // Function to fetch the names of all folders up to the current active position
     const getNames = async () => {
-        let temp: string[] = [];
-        for (const key in currentPath) {
-            temp.push((await db.filesAndFolders.get(currentPath[key]))?.name as string);
-        }
-        setNames(temp);
+        const folderNames = await Promise.all(
+            currentPath.map((id) => db.filesAndFolders.get(id).then((file) => file?.name || "Unknown"))
+        );
+        setNames(folderNames);
     };
+
+    // Effect to update breadcrumb names when the current path changes
     useEffect(() => {
         if (currentPath.length === 1) {
-            setNames(["Home"]);
-            return;
+            setNames(["Home"]); // Display "Home" when at the root level
+        } else {
+            getNames();
         }
-        getNames();
     }, [currentPath]);
-    return names.map((value: string, index) => {
-        return (
+
+    return names.map(
+        (name, index) =>
             index <= activePosition && (
                 <Fragment key={index}>
+                    {/* Home icon for the root */}
                     {index === 0 && <TiHome className="-mt-1 text-2xl mr-1.5" />}
-                    {!(index === 0) && <FaChevronRight className="mx-[4px]" />}
+                    {/* Chevron icon separator between items */}
+                    {index > 0 && <FaChevronRight className="mx-[4px]" />}
                     <button
                         className="text-2xl font-semibold"
                         onClick={(e: MouseEvent) => {
                             e.stopPropagation();
                             e.preventDefault();
-                            navigate(memoizedComputePath(index, currentPath));
-                            return;
+                            navigate(memoizedComputePath(index, currentPath)); // Navigate to the clicked path segment
                         }}
                     >
-                        {index === activePosition ? value : value.slice(0, 5)}
+                        {name}
                     </button>
                 </Fragment>
             )
-        );
-    });
+    );
 });
 
 export default Breadcrumb;

@@ -59,7 +59,6 @@ export const FileFolders = createContext<FileFoldersContextType>({
             // Returns a placeholder for file/folder data.
             id: "",
             name: "",
-            isExpanded: false,
             isFolder: 0,
             parentId: parentId,
             parentLineage: [],
@@ -70,14 +69,15 @@ export const FileFolders = createContext<FileFoldersContextType>({
     ],
     AddNewFileFolder: async () => {}, // Stub function for adding a new file or folder.
     RenameFileFolder: async () => {}, // Stub function for renaming a file or folder.
-    DeleteFileFolder: async () => {}, // Stub function for deleting a file or folder.
 });
 
 // Context for managing operations related to the recycle bin.
 export const RecycleBin = createContext<RecycleBinContextType>({
+    recycleBinItemCount: 0, // Flag indicating current count of items in recycle bin
     inRecycleBin: false, // Flag to indicate if the view is currently showing recycle bin items.
+    setRecycleBinItemCount: () => {}, // Function to get the count of items in the recycle bin.
     setInRecycleBin: () => {}, // Stub function to set the inRecycleBin flag.
-    GetRecycleBinCount: async () => 0, // Function to get the count of items in the recycle bin.
+    DeleteFileFolder: async () => {}, // Stub function for deleting a file or folder.
     RestoreFileFolder: async () => {}, // Stub function to restore a file or folder from the recycle bin.
     PermanentlyDeleteFileFolder: async () => {}, // Stub function to permanently delete a file or folder.
     EmptyRecycleBin: async () => {}, // Stub function to empty the recycle bin.

@@ -9,146 +9,120 @@ import { useFileFolders, useRecycleBin, useSelectedItem, useModal } from "../Hoo
 
 const Modal: FC = () => {
     const fileUploadRef = useRef<HTMLInputElement>(null);
+
     const { "*": splat } = useParams();
-    const { AddNewFileFolder, RenameFileFolder, DeleteFileFolder } = useFileFolders();
-    const { PermanentlyDeleteFileFolder, EmptyRecycleBin, RestoreFileFolder } = useRecycleBin();
+
+    const { AddNewFileFolder, RenameFileFolder } = useFileFolders();
+    const { PermanentlyDeleteFileFolder, EmptyRecycleBin, RestoreFileFolder, DeleteFileFolder } = useRecycleBin();
     const { isOpen, type, data, acceptPressed, setData, closeModal, setAcceptPressed } = useModal();
     const { id, setId, setIsFolder, setName } = useSelectedItem();
-    const handleAccept = async () => {
-        if (acceptPressed) {
-            let path: string[] = splat?.split("/").map((value) => value) as string[];
-            switch (type) {
-                case MODALS.NEW_FILE:
-                    AddNewFileFolder({
-                        id: uuidv4(),
-                        name: data as string,
-                        isFolder: 0,
-                        parentId: path[path.length - 1],
-                        parentLineage: path,
-                        isExpanded: false,
-                        lastModifiedTime: new Date(),
-                        childrenCount: 0,
-                        size: 0,
+
+    // Handle different modal confirmations based on the type
+    const handleAccept = () => {
+        let path: string[] = splat?.split("/").map((value) => value) as string[];
+        switch (type) {
+            case MODALS.UPLOAD_FILE:
+            case MODALS.NEW_FOLDER:
+                const fileInfo = {
+                    id: uuidv4(),
+                    name: data instanceof File ? data.name : (data as string),
+                    isFolder: type === MODALS.NEW_FOLDER ? 1 : 0,
+                    parentId: path[path.length - 1],
+                    parentLineage: path,
+                    lastModifiedTime: data instanceof File ? new Date(data.lastModified) : new Date(),
+                    childrenCount: 0,
+                    size: data instanceof File ? data.size : 0,
+                };
+                AddNewFileFolder(fileInfo)
+                    .then(() => closeModal())
+                    .catch((error) => {
+                        toast.error(getErrorMessage(error));
+                        setAcceptPressed(false);
+                    });
+                break;
+            case MODALS.RENAME_FILE:
+            case MODALS.RENAME_FOLDER:
+                RenameFileFolder({
+                    id: id,
+                    name: data as string,
+                })
+                    .then(() => {
+                        setId("");
+                        setIsFolder(0);
+                        setName("");
+                        closeModal();
                     })
-                        .then(() => closeModal())
-                        .catch((error) => {
-                            toast.error(getErrorMessage(error));
-                            setAcceptPressed(false);
-                        });
-                    break;
-                case MODALS.NEW_FOLDER:
-                    AddNewFileFolder({
-                        id: uuidv4(),
-                        name: data as string,
-                        isFolder: 1,
-                        parentId: path[path.length - 1],
-                        parentLineage: path,
-                        isExpanded: true,
-                        lastModifiedTime: new Date(),
-                        childrenCount: 0,
-                        size: 0,
+                    .catch((error) => {
+                        toast.error(getErrorMessage(error));
+                        setAcceptPressed(false);
+                    });
+                break;
+            case MODALS.DELETE_FILE:
+            case MODALS.DELETE_FOLDER:
+                DeleteFileFolder({
+                    id: id,
+                })
+                    .catch((error) => {
+                        toast.error(getErrorMessage(error));
                     })
-                        .then(() => closeModal())
-                        .catch((error) => {
-                            toast.error(getErrorMessage(error));
-                            setAcceptPressed(false);
-                        });
-                    break;
-                case MODALS.RENAME_FILE:
-                case MODALS.RENAME_FOLDER:
-                    RenameFileFolder({
-                        id: id,
-                        name: data as string,
+                    .finally(() => {
+                        setId("");
+                        setIsFolder(0);
+                        setName("");
+                        closeModal();
+                    });
+                break;
+            case MODALS.PERMANENT_DELETE_FILE:
+            case MODALS.PERMANENT_DELETE_FOLDER:
+                PermanentlyDeleteFileFolder({
+                    id: id,
+                })
+                    .catch((error) => {
+                        toast.error(getErrorMessage(error));
                     })
-                        .then(() => {
-                            setId("");
-                            setIsFolder(0);
-                            setName("");
-                            closeModal();
-                        })
-                        .catch((error) => {
-                            toast.error(getErrorMessage(error));
-                            setAcceptPressed(false);
-                        });
-                    break;
-                case MODALS.DELETE_FILE:
-                case MODALS.DELETE_FOLDER:
-                    DeleteFileFolder({
-                        id: id,
+                    .finally(() => {
+                        setId("");
+                        setIsFolder(0);
+                        setName("");
+                        closeModal();
+                    });
+                break;
+            case MODALS.EMPTY_BIN:
+                EmptyRecycleBin()
+                    .catch((error) => {
+                        toast.error(getErrorMessage(error));
                     })
-                        .catch((error) => {
-                            toast.error(getErrorMessage(error));
-                        })
-                        .finally(() => {
-                            setId("");
-                            setIsFolder(0);
-                            setName("");
-                            closeModal();
-                        });
-                    break;
-                case MODALS.PERMANENT_DELETE_FILE:
-                case MODALS.PERMANENT_DELETE_FOLDER:
-                    PermanentlyDeleteFileFolder({
-                        id: id,
-                    })
-                        .catch((error) => {
-                            toast.error(getErrorMessage(error));
-                        })
-                        .finally(() => {
-                            setId("");
-                            setIsFolder(0);
-                            setName("");
-                            closeModal();
-                        });
-                    break;
-                case MODALS.EMPTY_BIN:
-                    EmptyRecycleBin()
-                        .catch((error) => {
-                            toast.error(getErrorMessage(error));
-                        })
-                        .finally(() => {
-                            closeModal();
-                        });
-                    break;
-                case MODALS.NULL:
-                    RestoreFileFolder({
-                        id: id,
-                    })
-                        .catch((error) => toast.error(getErrorMessage(error)))
-                        .finally(() => {
-                            setId("");
-                            setIsFolder(0);
-                            setName("");
-                            setAcceptPressed(false);
-                        });
-                    break;
-                case MODALS.UPLOAD_FILE:
-                    AddNewFileFolder({
-                        id: uuidv4(),
-                        name: data instanceof File ? data.name : "",
-                        isFolder: 0,
-                        parentId: path[path.length - 1],
-                        parentLineage: path,
-                        isExpanded: false,
-                        lastModifiedTime: data instanceof File ? new Date(data.lastModified) : new Date(),
-                        childrenCount: 0,
-                        size: data instanceof File ? data.size : 0,
-                    })
-                        .then(() => closeModal())
-                        .catch((error) => {
-                            toast.error(getErrorMessage(error));
-                            setAcceptPressed(false);
-                        });
-                    break;
-            }
+                    .finally(() => {
+                        closeModal();
+                    });
+                break;
+            case MODALS.NULL:
+                RestoreFileFolder({
+                    id: id,
+                })
+                    .catch((error) => toast.error(getErrorMessage(error)))
+                    .finally(() => {
+                        setId("");
+                        setIsFolder(0);
+                        setName("");
+                        setAcceptPressed(false);
+                    });
+                break;
         }
     };
+
+    // Auto-trigger handleAccept when acceptPressed changes to true
     useEffect(() => {
-        handleAccept();
+        if (acceptPressed) {
+            handleAccept();
+        }
     }, [acceptPressed]);
-    if (!isOpen) return null;
-    if (type === MODALS.NULL) return null;
+    
+    // Prevent modal rendering if it is not open or if the type is MODALS.NULL
+    if (!isOpen || type === MODALS.NULL) return null;
+
     const { title, description, rejectButton, acceptButton } = ModalInfo[type];
+    
     return (
         <Transition appear show={isOpen} as={Fragment}>
             <Dialog
@@ -194,8 +168,7 @@ const Modal: FC = () => {
                                     <Description className={"text-start text-lg font-medium"}>
                                         {description}
                                     </Description>
-                                    {(type === MODALS.NEW_FILE ||
-                                        type === MODALS.NEW_FOLDER ||
+                                    {(type === MODALS.NEW_FOLDER ||
                                         type === MODALS.RENAME_FILE ||
                                         type === MODALS.RENAME_FOLDER) && (
                                         <input
@@ -232,7 +205,6 @@ const Modal: FC = () => {
                                             e.stopPropagation();
                                             e.preventDefault();
                                             closeModal();
-                                            return;
                                         }}
                                     >
                                         {rejectButton}
@@ -243,7 +215,6 @@ const Modal: FC = () => {
                                             e.stopPropagation();
                                             e.preventDefault();
                                             setAcceptPressed(true);
-                                            return;
                                         }}
                                     >
                                         {acceptButton}

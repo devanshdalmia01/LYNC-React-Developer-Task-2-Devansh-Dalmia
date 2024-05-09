@@ -2,17 +2,17 @@ import { FC, MouseEvent } from "react";
 import { BUTTONS, ButtonInfo, MODALS } from "../Types/enums";
 import { useModal, useSelectedItem } from "../Hooks/hooks";
 
+// Component for rendering a button that triggers various modal dialogs and actions based on its type.
 const Button: FC<{ type: BUTTONS }> = ({ type }) => {
-    const { id, isFolder, name } = useSelectedItem();
-    const { openModal, setAcceptPressed } = useModal();
+    const { id, isFolder, name } = useSelectedItem(); // Context hook to get selected item details.
+    const { openModal, setAcceptPressed } = useModal(); // Context hook to manage modal dialogs.
+
+    // Extract button styling and content based on its type.
     const { text, className, conditionalClassName, icon } = ButtonInfo[type];
-    const handleClick = (e: MouseEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
+
+    // Handles click events on the button, triggering different actions based on button type.
+    const handleClick = () => {
         switch (type) {
-            case BUTTONS.NEW_FILE_BUTTON:
-                openModal(MODALS.NEW_FILE);
-                break;
             case BUTTONS.NEW_FOLDER_BUTTON:
                 openModal(MODALS.NEW_FOLDER);
                 break;
@@ -33,26 +33,27 @@ const Button: FC<{ type: BUTTONS }> = ({ type }) => {
                 break;
             case BUTTONS.RESTORE_OPTION_BUTTON:
             case BUTTONS.RESTORE_BUTTON:
-                setAcceptPressed(true);
-                openModal(MODALS.NULL);
+                setAcceptPressed(true); // Setting a flag when the restore action is initiated.
+                openModal(MODALS.NULL); // Special case to handle restore without a specific modal dialog.
                 break;
             case BUTTONS.UPLOAD_FILE_BUTTON:
                 openModal(MODALS.UPLOAD_FILE);
                 break;
         }
     };
+
     return (
         <button
             className={`${className}${id.length === 0 ? ` ${conditionalClassName}` : ""}`}
             onClick={(e: MouseEvent) => {
                 e.stopPropagation();
                 e.preventDefault();
-                handleClick(e);
-                return;
+                handleClick();
             }}
         >
             {icon}
-            {text !== "" ? <span className="ml-2">{text}</span> : ""}
+            {/* Conditionally render text span if there is text. */}
+            {text && <span className="ml-2">{text}</span>}
         </button>
     );
 };

@@ -6,19 +6,24 @@ import Button from "./Button";
 import { useRecycleBin } from "../Hooks/hooks";
 import { FileFolderType } from "../Types/interface";
 
+/**
+ * A component that renders an options button with a context menu for each file or folder item.
+ * It adjusts the available options based on whether the item is in the recycle bin or not.
+ */
 const OptionButton: FC<{
     onSingleClick: (item: FileFolderType, e: MouseEvent, option: string) => void;
     item: FileFolderType;
 }> = ({ onSingleClick, item }) => {
-    const { inRecycleBin } = useRecycleBin();
+    const { inRecycleBin } = useRecycleBin(); // Determine if the current view is the recycle bin.
+
     return (
         <Menu>
             <MenuButton
-                onClick={(e: MouseEvent) => {
-                    onSingleClick(item, e, "option");
-                    return;
-                }}
                 className="hover:bg-gray-200 p-1 transition ease-out duration-150 rounded-full text-md text-gray-600"
+                onClick={(e: MouseEvent) => {
+                    // Trigger callback for option selection.
+                    onSingleClick(item, e, "option");
+                }}
             >
                 <HiDotsVertical />
             </MenuButton>
@@ -30,6 +35,7 @@ const OptionButton: FC<{
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
             >
+                {/* Conditionally render menu items based on the recycle bin state */}
                 <MenuItems
                     anchor="bottom end"
                     className={`${

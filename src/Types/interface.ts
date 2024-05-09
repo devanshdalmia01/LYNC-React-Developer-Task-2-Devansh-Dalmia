@@ -3,22 +3,21 @@ import { SORT_ORDER, SORT_TYPE, TYPE_FILTER, VIEW, MODALS } from "./enums";
 
 // Interface representing the structure of a file or folder.
 export interface FileFolderType {
-    id: string;  // Unique identifier for the file or folder
-    name: string;  // Display name of the file or folder
-    isFolder: number;  // Flag indicating if it's a folder (e.g., 1 for folder, 0 for file)
-    parentLineage: string[];  // Array of parent ids showing the path to this item
-    isExpanded: boolean;  // State of folder expansion in UI
-    parentId: string;  // Id of the parent folder
-    lastModifiedTime: Date;  // Timestamp of the last modification
-    childrenCount: number;  // Number of items inside the folder
-    size: number;  // Size of the file in bytes
+    id: string; // Unique identifier for the file or folder
+    name: string; // Display name of the file or folder
+    isFolder: number; // Flag indicating if it's a folder (e.g., 1 for folder, 0 for file)
+    parentLineage: string[]; // Array of parent ids showing the path to this item
+    parentId: string; // Id of the parent folder
+    lastModifiedTime: Date; // Timestamp of the last modification
+    childrenCount: number; // Number of items inside the folder
+    size: number; // Size of the file in bytes
 }
 
 // Interface for an item selected by the user.
 export interface SelectedItem {
-    id: string;  // Unique identifier for the selected item
-    name: string;  // Name of the selected item
-    isFolder: number;  // Indicates if the selected item is a folder
+    id: string; // Unique identifier for the selected item
+    name: string; // Name of the selected item
+    isFolder: number; // Indicates if the selected item is a folder
 }
 
 // Context type for managing the state of a selected item.
@@ -30,12 +29,12 @@ export interface SelectedItemContextType extends SelectedItem {
 
 // Context for managing modal dialogs within the application.
 export interface ModalContextType {
-    isOpen: boolean;  // Indicates if a modal is open
-    type: MODALS;  // Type of the modal to display
-    data: string | File;  // Data associated with the modal
-    acceptPressed: boolean;  // Flag indicating if the accept button was pressed
-    openModal: (type: MODALS, data?: string) => void;  // Function to open modal
-    closeModal: () => void;  // Function to close modal
+    isOpen: boolean; // Indicates if a modal is open
+    type: MODALS; // Type of the modal to display
+    data: string | File; // Data associated with the modal
+    acceptPressed: boolean; // Flag indicating if the accept button was pressed
+    openModal: (type: MODALS, data?: string) => void; // Function to open modal
+    closeModal: () => void; // Function to close modal
     setType: Dispatch<SetStateAction<MODALS>>;
     setData: (data: string | File) => void;
     setAcceptPressed: Dispatch<SetStateAction<boolean>>;
@@ -55,8 +54,8 @@ export interface ViewTypeFilterSortOrderContextType {
 
 // Context for managing the current location within the application's navigation.
 export interface CurrentLocationContextType {
-    activePosition: number;  // Active index in the navigation path
-    currentPath: string[];  // Array of strings representing the path
+    activePosition: number; // Active index in the navigation path
+    currentPath: string[]; // Array of strings representing the path
     setActivePosition: Dispatch<SetStateAction<number>>;
     setCurrentPath: Dispatch<SetStateAction<string[]>>;
 }
@@ -71,14 +70,15 @@ export interface FileFoldersContextType {
     }) => Promise<FileFolderType[]>;
     AddNewFileFolder: (data: FileFolderType) => Promise<void>;
     RenameFileFolder: (data: { id: string; name: string }) => Promise<void>;
-    DeleteFileFolder: (data: { id: string }) => Promise<void>;
 }
 
 // Context for managing the recycle bin's functionalities.
 export interface RecycleBinContextType {
-    inRecycleBin: boolean;  // Flag indicating if the current view is recycle bin
+    inRecycleBin: boolean; // Flag indicating if the current view is recycle bin
+    recycleBinItemCount: number; // Flag indicating current count of items in recycle bin
     setInRecycleBin: Dispatch<SetStateAction<boolean>>;
-    GetRecycleBinCount: () => Promise<number>;
+    setRecycleBinItemCount: Dispatch<SetStateAction<number>>;
+    DeleteFileFolder: (data: { id: string }) => Promise<void>;
     RestoreFileFolder: (data: { id: string }) => Promise<void>;
     PermanentlyDeleteFileFolder: (data: { id: string }) => Promise<void>;
     EmptyRecycleBin: () => Promise<void>;

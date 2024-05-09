@@ -194,6 +194,24 @@ export const FileFoldersProvider: FC<ProviderType> = ({ children }) => {
         await db.filesAndFolders.update(data.id, { name: data.name, lastModifiedTime: new Date() });
     };
 
+    return (
+        <FileFolders.Provider
+            value={{
+                GetMainData,
+                AddNewFileFolder,
+                RenameFileFolder,
+            }}
+        >
+            {children}
+        </FileFolders.Provider>
+    );
+};
+
+// Provides context for managing the recycle bin, including restoration and deletion of items.
+export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
+    const [inRecycleBin, setInRecycleBin] = useState<boolean>(false);
+    const [recycleBinItemCount, setRecycleBinItemCount] = useState<number>(0);
+
     // Function to handle moving an item to the recycle bin.
     const DeleteFileFolder = async (data: { id: string }) => {
         const itemToDelete = await db.filesAndFolders.get(data.id);
@@ -213,6 +231,15 @@ export const FileFoldersProvider: FC<ProviderType> = ({ children }) => {
                 itemToDelete.id
             );
 
+            // Add to the count of recycle bin
+            const parentFolder = await db.recycleBin.get("-1");
+            const updatedRecycleBinCount = (parentFolder?.childrenCount ?? 0) + 1;
+            await db.recycleBin.update("-1", {
+                childrenCount: updatedRecycleBinCount,
+                lastModifiedTime: new Date(),
+            });
+            setRecycleBinItemCount(updatedRecycleBinCount);
+
             // Delete the original item and update the parent's children count if necessary.
             await db.filesAndFolders.delete(data.id);
 
@@ -231,24 +258,6 @@ export const FileFoldersProvider: FC<ProviderType> = ({ children }) => {
         }
     };
 
-    return (
-        <FileFolders.Provider
-            value={{
-                GetMainData,
-                AddNewFileFolder,
-                RenameFileFolder,
-                DeleteFileFolder,
-            }}
-        >
-            {children}
-        </FileFolders.Provider>
-    );
-};
-
-// Provides context for managing the recycle bin, including restoration and deletion of items.
-export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
-    const [inRecycleBin, setInRecycleBin] = useState<boolean>(false);
-
     // Permanently deletes an item from the recycle bin.
     const PermanentlyDeleteFileFolder = async (data: { id: string }) => {
         try {
@@ -260,6 +269,15 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
                 }
 
                 await db.recycleBin.delete(data.id);
+
+                // Subtract from the count of recycle bin
+                const parentFolder = await db.recycleBin.get("-1");
+                const updatedRecycleBinCount = (parentFolder?.childrenCount ?? 1) - 1;
+                await db.recycleBin.update("-1", {
+                    childrenCount: updatedRecycleBinCount,
+                    lastModifiedTime: new Date(),
+                });
+                setRecycleBinItemCount(updatedRecycleBinCount);
 
                 // Also delete any children of the deleted item.
                 const childrenIds = await db.filesAndFolders.where({ parentId: data.id }).primaryKeys();
@@ -302,6 +320,15 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
                 // Remove the item from the recycle bin
                 await db.recycleBin.delete(data.id);
 
+                // Subtract from the count of recycle bin
+                const parentFolder = await db.recycleBin.get("-1");
+                const updatedRecycleBinCount = (parentFolder?.childrenCount ?? 1) - 1;
+                await db.recycleBin.update("-1", {
+                    childrenCount: updatedRecycleBinCount,
+                    lastModifiedTime: new Date(),
+                });
+                setRecycleBinItemCount(updatedRecycleBinCount);
+
                 // Update parent folder's children count and last modified time
                 const updatedChildrenCount = (parentFolder?.childrenCount ?? 0) + 1;
                 await db.filesAndFolders.update(parentFolder?.id, {
@@ -322,6 +349,12 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
                 const keys = await db.recycleBin.where({ parentId: "-1" }).primaryKeys();
                 await db.recycleBin.bulkDelete(keys);
 
+                await db.recycleBin.update("-1", {
+                    childrenCount: 0,
+                    lastModifiedTime: new Date(),
+                });
+                setRecycleBinItemCount(0);
+
                 // Optionally clear all items if the parent folder is "Home" and it's empty.
                 if (!(await db.filesAndFolders.where({ parentId: "0" }).count())) {
                     await db.filesAndFolders.clear();
@@ -330,7 +363,6 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
                         id: "0",
                         name: "Home",
                         isFolder: 1,
-                        isExpanded: true,
                         parentLineage: [],
                         parentId: "-2",
                         childrenCount: 0,
@@ -344,21 +376,14 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
         }
     };
 
-    // Retrieves the count of items in the recycle bin.
-    const GetRecycleBinCount = async () => {
-        try {
-            return await db.recycleBin.where({ parentId: "-1" }).count();
-        } catch (error) {
-            throw new Error("Failed to retrieve recycle bin count due to an internal error.");
-        }
-    };
-
     return (
         <RecycleBin.Provider
             value={{
+                recycleBinItemCount,
                 inRecycleBin,
+                setRecycleBinItemCount,
                 setInRecycleBin,
-                GetRecycleBinCount,
+                DeleteFileFolder,
                 PermanentlyDeleteFileFolder,
                 RestoreFileFolder,
                 EmptyRecycleBin,

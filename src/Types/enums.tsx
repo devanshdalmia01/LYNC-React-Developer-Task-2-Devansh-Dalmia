@@ -1,7 +1,7 @@
 import { ButtonConfig, ModalConfig } from "./interface";
 import { FaEdit, FaFileUpload, FaUndo } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
-import { AiFillFolderAdd, AiFillFileAdd } from "react-icons/ai";
+import { AiFillFolderAdd } from "react-icons/ai";
 
 // Enum to define different views such as grid and list.
 export enum VIEW {
@@ -31,7 +31,7 @@ export enum SORT_ORDER {
 
 // Enum defining the types of modals that can be used in the application.
 export enum MODALS {
-    NEW_FILE,
+    UPLOAD_FILE,
     NEW_FOLDER,
     RENAME_FILE,
     RENAME_FOLDER,
@@ -40,14 +40,12 @@ export enum MODALS {
     PERMANENT_DELETE_FILE,
     PERMANENT_DELETE_FOLDER,
     EMPTY_BIN,
-    UPLOAD_FILE,
     NULL, // Represents no modal
 }
 
 // Enum for different button types in the UI, defining their functional context.
 export enum BUTTONS {
     UPLOAD_FILE_BUTTON,
-    NEW_FILE_BUTTON,
     NEW_FOLDER_BUTTON,
     RENAME_BUTTON,
     RENAME_OPTION_BUTTON,
@@ -74,11 +72,11 @@ export const ModalInfo: Record<MODALS, ModalConfig> = {
         rejectButton: "No",
         acceptButton: "Yes",
     },
-    [MODALS.NEW_FILE]: {
-        title: "Create New File",
-        description: "Enter name of the file",
+    [MODALS.UPLOAD_FILE]: {
+        title: "Upload New File",
+        description: "Select the file",
         rejectButton: "Cancel",
-        acceptButton: "Create",
+        acceptButton: "Add",
     },
     [MODALS.NEW_FOLDER]: {
         title: "Create New Folder",
@@ -116,12 +114,6 @@ export const ModalInfo: Record<MODALS, ModalConfig> = {
         rejectButton: "No",
         acceptButton: "Yes",
     },
-    [MODALS.UPLOAD_FILE]: {
-        title: "Upload New File",
-        description: "Select the file",
-        rejectButton: "Cancel",
-        acceptButton: "Add",
-    },
     [MODALS.NULL]: {
         title: "NULL",
         description: "NULL",
@@ -147,12 +139,6 @@ export const ButtonInfo: Record<BUTTONS, ButtonConfig> = {
         className: buttonWithTextClass,
         conditionalClassName: "",
         icon: <FaFileUpload className={buttonWithTextIconClass} />,
-    },
-    [BUTTONS.NEW_FILE_BUTTON]: {
-        text: "Add File",
-        className: buttonWithTextClass,
-        conditionalClassName: "",
-        icon: <AiFillFileAdd className={buttonWithTextIconClass} />,
     },
     [BUTTONS.NEW_FOLDER_BUTTON]: {
         text: "Add Folder",
