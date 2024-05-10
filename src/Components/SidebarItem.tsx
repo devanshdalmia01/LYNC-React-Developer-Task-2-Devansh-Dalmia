@@ -127,12 +127,12 @@ const SidebarItem: FC<{ currentId: string; isFolder: number }> = ({ currentId, i
             >
                 {/* Folder or File icon */}
                 {itemData?.isFolder ? <FaFolder className="mr-2 -mt-1" /> : <FaFile className="mr-2 -mt-1" />}
-                <span className="flex-grow">{itemData?.name}</span>
+                <span className="flex-grow">{itemData?.name?.slice(0, 30)}</span>
                 {/* Expand/Collapse button */}
                 {itemData?.isFolder ? (
                     <button
                         aria-label="expand collapse button"
-                        className="cursor-pointer"
+                        className="cursor-pointer ml-3"
                         onClick={(e: MouseEvent) => {
                             e.stopPropagation();
                             e.preventDefault();
