@@ -37,7 +37,7 @@ const Button: FC<{ type: BUTTONS }> = ({ type }) => {
                 openModal(MODALS.NULL); // Special case to handle restore without a specific modal dialog.
                 break;
             case BUTTONS.UPLOAD_FILE_BUTTON:
-                openModal(MODALS.UPLOAD_FILE);
+                openModal(MODALS.UPLOAD_FILE, new File([""], "", { type: "text/html" }));
                 break;
         }
     };

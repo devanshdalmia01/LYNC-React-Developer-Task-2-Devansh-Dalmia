@@ -1,4 +1,4 @@
-import { useState, FC } from "react";
+import { useState, FC, useEffect } from "react";
 import { ProviderType, FileFolderType } from "../Types/interface";
 import { SelectedItem, Modal, FileFolders, RecycleBin, ViewTypeFilterSort, CurrentLocation } from "./context";
 import { db } from "../Utils/db";
@@ -35,7 +35,7 @@ export const ModalProvider: FC<ProviderType> = ({ children }) => {
     const [acceptPressed, setAcceptPressed] = useState<boolean>(false);
 
     // Function to handle opening modals with appropriate data and type.
-    const openModal = (modalType: MODALS, data?: string) => {
+    const openModal = (modalType: MODALS, data?: string | File) => {
         setType(modalType);
         setData(data || "");
         setIsOpen(true);
@@ -211,6 +211,20 @@ export const FileFoldersProvider: FC<ProviderType> = ({ children }) => {
 export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
     const [inRecycleBin, setInRecycleBin] = useState<boolean>(false);
     const [recycleBinItemCount, setRecycleBinItemCount] = useState<number>(0);
+
+    // To keep the count updated
+    useEffect(() => {
+        const fetchRecycleBinCount = async () => {
+            try {
+                const recycleBin = await db.recycleBin.get("-1");
+                setRecycleBinItemCount(recycleBin?.childrenCount ?? 0);
+            } catch (error) {
+                toast.error("Failed to load recycle bin information.");
+            }
+        };
+
+        fetchRecycleBinCount();
+    }, []);
 
     // Function to handle moving an item to the recycle bin.
     const DeleteFileFolder = async (data: { id: string }) => {

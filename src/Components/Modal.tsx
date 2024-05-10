@@ -1,4 +1,4 @@
-import { FC, ChangeEvent, MouseEvent, Fragment, useEffect, useRef } from "react";
+import { FC, ChangeEvent, MouseEvent, Fragment, useEffect, useRef, useState } from "react";
 import { Dialog, DialogPanel, DialogTitle, Description, Transition, TransitionChild } from "@headlessui/react";
 import { MODALS, ModalInfo } from "../Types/enums";
 import { v4 as uuidv4 } from "uuid";
@@ -11,6 +11,8 @@ const Modal: FC = () => {
     const fileUploadRef = useRef<HTMLInputElement>(null);
 
     const { "*": splat } = useParams();
+
+    const [openFileFinder, setOpenFileFinder] = useState<boolean>(true);
 
     const { AddNewFileFolder, RenameFileFolder } = useFileFolders();
     const { PermanentlyDeleteFileFolder, EmptyRecycleBin, RestoreFileFolder, DeleteFileFolder } = useRecycleBin();
@@ -117,12 +119,12 @@ const Modal: FC = () => {
             handleAccept();
         }
     }, [acceptPressed]);
-    
+
     // Prevent modal rendering if it is not open or if the type is MODALS.NULL
     if (!isOpen || type === MODALS.NULL) return null;
 
     const { title, description, rejectButton, acceptButton } = ModalInfo[type];
-    
+
     return (
         <Transition appear show={isOpen} as={Fragment}>
             <Dialog
@@ -133,8 +135,14 @@ const Modal: FC = () => {
                     closeModal();
                 }}
                 onFocus={() => {
-                    if (type === MODALS.UPLOAD_FILE && data instanceof File && data.name.length === 0) {
+                    if (
+                        openFileFinder &&
+                        type === MODALS.UPLOAD_FILE &&
+                        data instanceof File &&
+                        data.name.length === 0
+                    ) {
                         fileUploadRef.current?.click();
+                        setOpenFileFinder(false);
                     }
                 }}
             >

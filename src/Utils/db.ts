@@ -2,7 +2,7 @@ import Dexie, { Table } from "dexie";
 import { FileFolderType } from "../Types/interface";
 
 // Defines a class extending Dexie to manage a local IndexedDB database for file and folder management.
-export class FileManagerDB extends Dexie {
+class FileManagerDB extends Dexie {
     // Declares tables in the database for files/folders and items in the recycle bin.
     filesAndFolders!: Table<FileFolderType>;
     recycleBin!: Table<FileFolderType>;
@@ -18,37 +18,54 @@ export class FileManagerDB extends Dexie {
 }
 
 // Creates an instance of the FileManagerDB class.
-export const db = new FileManagerDB();
+const db = new FileManagerDB();
 
 // Performs a transaction on the database to add default entries for 'Home' and 'Recycle Bin'.
-db.transaction("rw", [db.filesAndFolders, db.recycleBin], async () => {
-    // Adds a default 'Home' folder entry to the 'filesAndFolders' table.
-    await db.filesAndFolders.put(
-        {
-            id: "0", // Unique identifier for the Home folder.
-            name: "Home", // Name of the folder.
-            isFolder: 1, // Indicates this entry is a folder.
-            parentLineage: [], // An empty array since 'Home' has no parents.
-            parentId: "-2", // Parent Id, indicating no parent.
-            childrenCount: 0, // Initially, no children.
-            lastModifiedTime: new Date(), // Timestamp of creation.
-            size: 0, // Size in bytes, zero for folders.
-        },
-        "0" // Key for the data entry.
-    );
+async function initializeDB() {
+    try {
+        await db.transaction("rw", [db.filesAndFolders, db.recycleBin], async () => {
+            // Check if 'Home' or 'Recycle Bin' already exist to avoid re-adding them.
+            const homeExists = await db.filesAndFolders.get("0");
+            // Adds a default 'Home' folder entry to the 'filesAndFolders' table.
+            if (!homeExists) {
+                await db.filesAndFolders.add(
+                    {
+                        id: "0", // Unique identifier for the Home folder.
+                        name: "Home", // Name of the folder.
+                        isFolder: 1, // Indicates this entry is a folder.
+                        parentLineage: [], // An empty array since 'Home' has no parents.
+                        parentId: "-2", // Parent Id, indicating no parent.
+                        childrenCount: 0, // Initially, no children.
+                        lastModifiedTime: new Date(), // Timestamp of creation.
+                        size: 0, // Size in bytes, zero for folders.
+                    },
+                    "0" // Key for the data entry.
+                );
+            }
 
-    // Adds a default 'Recycle Bin' entry to the 'recycleBin' table.
-    await db.recycleBin.put(
-        {
-            id: "-1", // Unique identifier for the Recycle Bin.
-            name: "Recycle Bin", // Name of the folder.
-            isFolder: 1, // Indicates this entry is a folder.
-            parentLineage: [], // An empty array since 'Recycle Bin' has no parents.
-            parentId: "-2", // Parent Id, indicating no parent.
-            childrenCount: 0, // Initially, no children.
-            lastModifiedTime: new Date(), // Timestamp of creation.
-            size: 0, // Size in bytes, zero for folders.
-        },
-        "-1" // Key for the data entry.
-    );
-});
+            const recycleBinExists = await db.recycleBin.get("-1");
+            // Adds a default 'Recycle Bin' entry to the 'recycleBin' table.
+            if (!recycleBinExists) {
+                await db.recycleBin.add(
+                    {
+                        id: "-1", // Unique identifier for the Recycle Bin.
+                        name: "Recycle Bin", // Name of the folder.
+                        isFolder: 1, // Indicates this entry is a folder.
+                        parentLineage: [], // An empty array since 'Recycle Bin' has no parents.
+                        parentId: "-2", // Parent Id, indicating no parent.
+                        childrenCount: 0, // Initially, no children.
+                        lastModifiedTime: new Date(), // Timestamp of creation.
+                        size: 0, // Size in bytes, zero for folders.
+                    },
+                    "-1" // Key for the data entry.
+                );
+            }
+        });
+    } catch (error) {
+        console.error("Error initializing database:", error);
+        throw new Error("Failed to initialize database");
+    }
+}
+
+// Exports the database and the initialization function
+export { db, initializeDB };

@@ -91,7 +91,6 @@ const SidebarItem: FC<{ currentId: string; isFolder: number }> = ({ currentId, i
                     </MenuItems>
                 </Transition>
             </Menu>
-            
             {/* Sidebar item */}
             <div
                 onContextMenu={(e) => {
@@ -150,7 +149,6 @@ const SidebarItem: FC<{ currentId: string; isFolder: number }> = ({ currentId, i
                     ""
                 )}
             </div>
-            
             {/* Render children if expanded */}
             {isExpanded && childrenData.length > 0 ? (
                 <>

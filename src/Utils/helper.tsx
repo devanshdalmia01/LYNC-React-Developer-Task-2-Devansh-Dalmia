@@ -60,7 +60,7 @@ export const fetchData = async ({
         query.reverse();
     }
 
-    return await query.sortBy(sort);
+    return await query.sortBy(sort === SORT_TYPE.SIZE && isFolder === 1 ? "childrenCount" : sort);
 };
 
 // Formats a Date object into a human-readable string, including time and date.

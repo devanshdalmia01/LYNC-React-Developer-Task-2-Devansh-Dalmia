@@ -11,15 +11,15 @@ export enum VIEW {
 
 // Enum to filter by file type, either files or folders, or both.
 export enum TYPE_FILTER {
-    FILE_FOLDER,
-    FOLDER,
-    FILE,
+    FILE_FOLDER = "both",
+    FOLDER = "folder",
+    FILE = "file",
 }
 
 // Enum to specify sorting criteria for file and folder listings.
 export enum SORT_TYPE {
     NAME = "name",
-    DATE_MODIFIED = "lastModifiedTime",
+    LAST_MODIFIED = "lastModifiedTime",
     SIZE = "size",
 }
 

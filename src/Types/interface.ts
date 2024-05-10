@@ -33,7 +33,7 @@ export interface ModalContextType {
     type: MODALS; // Type of the modal to display
     data: string | File; // Data associated with the modal
     acceptPressed: boolean; // Flag indicating if the accept button was pressed
-    openModal: (type: MODALS, data?: string) => void; // Function to open modal
+    openModal: (type: MODALS, data?: string | File) => void; // Function to open modal
     closeModal: () => void; // Function to close modal
     setType: Dispatch<SetStateAction<MODALS>>;
     setData: (data: string | File) => void;
