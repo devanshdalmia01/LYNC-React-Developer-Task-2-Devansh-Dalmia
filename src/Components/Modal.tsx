@@ -1,4 +1,4 @@
-import { FC, ChangeEvent, MouseEvent, Fragment, useEffect, useRef, useState } from "react";
+import { FC, ChangeEvent, MouseEvent, Fragment, useEffect, useRef } from "react";
 import { Dialog, DialogPanel, DialogTitle, Description, Transition, TransitionChild } from "@headlessui/react";
 import { MODALS, ModalInfo } from "../Types/enums";
 import { v4 as uuidv4 } from "uuid";
@@ -12,11 +12,19 @@ const Modal: FC = () => {
 
     const { "*": splat } = useParams();
 
-    const [openFileFinder, setOpenFileFinder] = useState<boolean>(true);
-
     const { AddNewFileFolder, RenameFileFolder } = useFileFolders();
     const { PermanentlyDeleteFileFolder, EmptyRecycleBin, RestoreFileFolder, DeleteFileFolder } = useRecycleBin();
-    const { isOpen, type, data, acceptPressed, setData, closeModal, setAcceptPressed } = useModal();
+    const {
+        isOpen,
+        type,
+        data,
+        acceptPressed,
+        openFileFinder,
+        setData,
+        closeModal,
+        setAcceptPressed,
+        setOpenFileFinder,
+    } = useModal();
     const { id, setId, setIsFolder, setName } = useSelectedItem();
 
     // Handle different modal confirmations based on the type

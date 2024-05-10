@@ -76,7 +76,7 @@ function getDate(time: Date): string {
     const month: number = now.getMonth() + 1; // months are zero indexed
     const day: number = now.getDate();
     const year: number = now.getFullYear();
-    const strDate: string = `${month < 10 ? "0" + month : month}/${day < 10 ? "0" + day : day}/${year}`;
+    const strDate: string = `${day < 10 ? "0" + day : day}/${month < 10 ? "0" + month : month}/${year}`;
 
     return `${strDate}, ${strTime}`;
 }

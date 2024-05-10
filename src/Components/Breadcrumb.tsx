@@ -5,6 +5,7 @@ import { useCurrentLocation } from "../Hooks/hooks";
 import { db } from "../Utils/db";
 import { useNavigate } from "react-router-dom";
 import { memoizedComputePath } from "../Utils/helper";
+import { toast } from "react-toastify";
 
 // Memoized Breadcrumb component to prevent re-renders unless necessary
 const Breadcrumb: FC = memo(() => {
@@ -13,12 +14,19 @@ const Breadcrumb: FC = memo(() => {
     const { activePosition, currentPath } = useCurrentLocation();
 
     const [names, setNames] = useState<string[]>([]);
+    const [deletedItem, setDeletedItem] = useState<string>("");
 
     // Function to fetch the names of all folders up to the current active position
     const getNames = async () => {
         const folderNames = await Promise.all(
             currentPath.map((id) => db.filesAndFolders.get(id).then((file) => file?.name || "Unknown"))
         );
+        folderNames.forEach((name, index) => {
+            if (name === "Unknown") {
+                db.recycleBin.get(currentPath[index]).then((value) => setDeletedItem(value?.name as string));
+                return;
+            }
+        });
         setNames(folderNames);
     };
 
@@ -30,6 +38,15 @@ const Breadcrumb: FC = memo(() => {
             getNames();
         }
     }, [currentPath]);
+
+    useEffect(() => {
+        if (deletedItem !== "") {
+            navigate("/recyclebin");
+            toast.error(
+                `${deletedItem}, this folder you are trying to navigate is deleted! Please restore to navigate!`
+            );
+        }
+    }, [deletedItem]);
 
     return names.map(
         (name, index) =>

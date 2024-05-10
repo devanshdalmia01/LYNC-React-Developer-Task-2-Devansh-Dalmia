@@ -21,6 +21,7 @@ export const SelectedItem = createContext<SelectedItemContextType>({
 
 // Context for managing modal states, such as visibility and content.
 export const Modal = createContext<ModalContextType>({
+    openFileFinder: false,
     isOpen: false,
     type: MODALS.NULL,
     data: "",
@@ -30,6 +31,7 @@ export const Modal = createContext<ModalContextType>({
     setType: () => {}, // Stub function to set the type of modal.
     setData: () => {}, // Stub function to set data in the modal.
     setAcceptPressed: () => {}, // Stub function to set the accept button pressed state.
+    setOpenFileFinder: () => {},
 });
 
 // Context for managing the view preferences, filters, and sorting of lists.

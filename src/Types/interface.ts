@@ -29,6 +29,7 @@ export interface SelectedItemContextType extends SelectedItem {
 
 // Context for managing modal dialogs within the application.
 export interface ModalContextType {
+    openFileFinder:boolean;
     isOpen: boolean; // Indicates if a modal is open
     type: MODALS; // Type of the modal to display
     data: string | File; // Data associated with the modal
@@ -38,6 +39,7 @@ export interface ModalContextType {
     setType: Dispatch<SetStateAction<MODALS>>;
     setData: (data: string | File) => void;
     setAcceptPressed: Dispatch<SetStateAction<boolean>>;
+    setOpenFileFinder: Dispatch<SetStateAction<boolean>>;
 }
 
 // Context for controlling view settings, type filters, and sorting.

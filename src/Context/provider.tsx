@@ -33,6 +33,7 @@ export const ModalProvider: FC<ProviderType> = ({ children }) => {
     const [type, setType] = useState<MODALS>(MODALS.NULL);
     const [data, setData] = useState<string | File>("");
     const [acceptPressed, setAcceptPressed] = useState<boolean>(false);
+    const [openFileFinder, setOpenFileFinder] = useState<boolean>(true);
 
     // Function to handle opening modals with appropriate data and type.
     const openModal = (modalType: MODALS, data?: string | File) => {
@@ -47,20 +48,23 @@ export const ModalProvider: FC<ProviderType> = ({ children }) => {
         setType(MODALS.NULL);
         setData("");
         setAcceptPressed(false);
+        setOpenFileFinder(true);
     };
 
     return (
         <Modal.Provider
             value={{
+                openFileFinder,
                 isOpen,
                 type,
                 data,
+                acceptPressed,
                 setType,
                 setData,
                 openModal,
                 closeModal,
-                acceptPressed,
                 setAcceptPressed,
+                setOpenFileFinder,
             }}
         >
             {children}
