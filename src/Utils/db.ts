@@ -11,7 +11,7 @@ class FileManagerDB extends Dexie {
         super("FileManagerDB"); // Initializes a new Dexie database named "FileManagerDB".
         // Defines the database schema for version 1.
         this.version(1).stores({
-            filesAndFolders: "&id, [name+parentId+isFolder], [parentId+isFolder], parentId", // Schema for the 'filesAndFolders' table.
+            filesAndFolders: "&id, [name+parentId+isFolder], [parentId+isFolder], parentId, parentLineage", // Schema for the 'filesAndFolders' table.
             recycleBin: "&id, parentId, [parentId+isFolder]", // Schema for the 'recycleBin' table.
         });
     }
@@ -33,7 +33,7 @@ async function initializeDB() {
                         id: "0", // Unique identifier for the Home folder.
                         name: "Home", // Name of the folder.
                         isFolder: 1, // Indicates this entry is a folder.
-                        parentLineage: [], // An empty array since 'Home' has no parents.
+                        parentLineage: "", // An empty string since 'Home' has no parents.
                         parentId: "-2", // Parent Id, indicating no parent.
                         childrenCount: 0, // Initially, no children.
                         lastModifiedTime: new Date(), // Timestamp of creation.
@@ -51,7 +51,7 @@ async function initializeDB() {
                         id: "-1", // Unique identifier for the Recycle Bin.
                         name: "Recycle Bin", // Name of the folder.
                         isFolder: 1, // Indicates this entry is a folder.
-                        parentLineage: [], // An empty array since 'Recycle Bin' has no parents.
+                        parentLineage: "", // An empty string since 'Recycle Bin' has no parents.
                         parentId: "-2", // Parent Id, indicating no parent.
                         childrenCount: 0, // Initially, no children.
                         lastModifiedTime: new Date(), // Timestamp of creation.

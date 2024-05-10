@@ -24,7 +24,7 @@ const SidebarItem: FC<{ currentId: string; isFolder: number }> = ({ currentId, i
         id: "",
         name: "",
         isFolder: 0,
-        parentLineage: [],
+        parentLineage: "",
         parentId: "",
         lastModifiedTime: new Date(),
         childrenCount: 0,
@@ -115,7 +115,8 @@ const SidebarItem: FC<{ currentId: string; isFolder: number }> = ({ currentId, i
                     e.preventDefault();
                     if (itemData?.isFolder) {
                         try {
-                            let temp: string[] = [...itemData.parentLineage];
+                            let temp: string[] =
+                                itemData.parentLineage === "" ? [] : [...itemData.parentLineage.split("/")];
                             navigate(memoizedComputePath(temp.push(itemData.id) - 1, temp));
                         } catch (error) {
                             toast.error(getErrorMessage(error));

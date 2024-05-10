@@ -38,7 +38,7 @@ const Modal: FC = () => {
                     name: data instanceof File ? data.name : (data as string),
                     isFolder: type === MODALS.NEW_FOLDER ? 1 : 0,
                     parentId: path[path.length - 1],
-                    parentLineage: path,
+                    parentLineage: path.join("/"),
                     lastModifiedTime: data instanceof File ? new Date(data.lastModified) : new Date(),
                     childrenCount: 0,
                     size: data instanceof File ? data.size : 0,

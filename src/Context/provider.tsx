@@ -276,16 +276,24 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
         }
     };
 
-    // Permanently deletes an item from the recycle bin.
+    // Permanently deletes an item from the recycle bin, including all descendants.
     const PermanentlyDeleteFileFolder = async (data: { id: string }) => {
         try {
             // Perform transactional deletion, ensuring that all references are removed.
             await db.transaction("rw", [db.recycleBin, db.filesAndFolders], async () => {
-                const item = await db.recycleBin.get(data.id);
-                if (!item) {
-                    throw new Error("Folder/File doesn't exist!");
+                const itemToDelete = await db.recycleBin.get(data.id);
+                if (!itemToDelete) {
+                    throw new Error("Folder/File doesn't exist in the recycle bin!");
                 }
 
+                // Delete all descendants of the item from the recycle bin
+                // Assuming parentLineage includes the id of the item itself
+                await db.filesAndFolders
+                    .where("parentLineage")
+                    .startsWith(itemToDelete.parentLineage + "/" + data.id)
+                    .delete();
+
+                // Delete the item itself
                 await db.recycleBin.delete(data.id);
 
                 // Subtract from the count of recycle bin
@@ -296,12 +304,6 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
                     lastModifiedTime: new Date(),
                 });
                 setRecycleBinItemCount(updatedRecycleBinCount);
-
-                // Also delete any children of the deleted item.
-                const childrenIds = await db.filesAndFolders.where({ parentId: data.id }).primaryKeys();
-                if (childrenIds.length > 0) {
-                    await db.filesAndFolders.bulkDelete(childrenIds);
-                }
             });
         } catch (error) {
             throw new Error("Failed to perform delete operations due to an internal error.");
@@ -317,14 +319,15 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
             }
 
             // Verify the parent exists or reset to "Home".
-            const lastKnownParentId = itemToRestore.parentLineage[itemToRestore.parentLineage.length - 1];
+            const parentLineage = itemToRestore.parentLineage.split("/");
+            const lastKnownParentId = parentLineage[parentLineage.length - 1];
             const parentFolder = await db.filesAndFolders.get(lastKnownParentId);
 
             // If the original parent doesn't exist anymore, reset to "Home"
             if (!parentFolder) {
                 toast.warning('Parent directory does not exist. Restoring to "Home".');
                 itemToRestore.parentId = "0";
-                itemToRestore.parentLineage = ["0"];
+                itemToRestore.parentLineage = "0";
             } else {
                 itemToRestore.parentId = lastKnownParentId;
             }
@@ -359,13 +362,24 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
         }
     };
 
-    // Empties all items from the recycle bin.
+    // Empties all items from the recycle bin, including any descendants of those items.
     const EmptyRecycleBin = async () => {
         try {
-            // Clear all items in the recycle bin.
             await db.transaction("rw", [db.recycleBin, db.filesAndFolders], async () => {
-                const keys = await db.recycleBin.where({ parentId: "-1" }).primaryKeys();
-                await db.recycleBin.bulkDelete(keys);
+                // Retrieve all items from the recycle bin
+                const itemsInRecycleBin = await db.recycleBin.where({ parentId: "-1" }).toArray();
+
+                // Iterate over each item and delete it along with its descendants
+                for (const item of itemsInRecycleBin) {
+                    // Delete all descendants of the item, including the item itself
+                    await db.filesAndFolders
+                        .where("parentLineage")
+                        .startsWith(item.parentLineage + "/" + item.id)
+                        .delete();
+                }
+
+                // Clear all items in the recycle bin.
+                await db.recycleBin.where({ parentId: "-1" }).delete();
 
                 await db.recycleBin.update("-1", {
                     childrenCount: 0,
@@ -381,7 +395,7 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
                         id: "0",
                         name: "Home",
                         isFolder: 1,
-                        parentLineage: [],
+                        parentLineage: "",
                         parentId: "-2",
                         childrenCount: 0,
                         lastModifiedTime: new Date(),

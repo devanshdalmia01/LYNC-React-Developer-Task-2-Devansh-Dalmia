@@ -6,7 +6,7 @@ export interface FileFolderType {
     id: string; // Unique identifier for the file or folder
     name: string; // Display name of the file or folder
     isFolder: number; // Flag indicating if it's a folder (e.g., 1 for folder, 0 for file)
-    parentLineage: string[]; // Array of parent ids showing the path to this item
+    parentLineage: string; // Array of parent ids showing the path to this item
     parentId: string; // Id of the parent folder
     lastModifiedTime: Date; // Timestamp of the last modification
     childrenCount: number; // Number of items inside the folder
@@ -29,7 +29,7 @@ export interface SelectedItemContextType extends SelectedItem {
 
 // Context for managing modal dialogs within the application.
 export interface ModalContextType {
-    openFileFinder:boolean;
+    openFileFinder: boolean;
     isOpen: boolean; // Indicates if a modal is open
     type: MODALS; // Type of the modal to display
     data: string | File; // Data associated with the modal

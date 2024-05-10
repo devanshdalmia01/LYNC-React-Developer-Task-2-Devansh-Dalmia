@@ -63,7 +63,7 @@ export const FileFolders = createContext<FileFoldersContextType>({
             name: "",
             isFolder: 0,
             parentId: parentId,
-            parentLineage: [],
+            parentLineage: "",
             childrenCount: 0,
             lastModifiedTime: new Date(),
             size: 0,
