@@ -88,7 +88,7 @@ const MainItems: FC = () => {
     return (inRecycleBin && recycleBinItemCount > 0) || (!inRecycleBin && itemChildrenCount > 0) ? (
         // Render if data exists
         <>
-            <div className="flex justify-evenly sticky top-0 mb-5 bg-gray-50">
+            <div className="flex justify-evenly sticky top-0 z-10 py-5 bg-gray-50">
                 <div className="relative flex w-[15%] justify-center items-center">
                     <select
                         defaultChecked={true}
@@ -232,12 +232,12 @@ const MainItems: FC = () => {
                         </>
                     ) : (
                         // Render as grid
-                        <div className="ml-10 grid grid-cols-5 space-y-reverse space-y-5 pb-5">
+                        <div className="ml-6 grid grid-cols-5 space-y-reverse space-y-5 pb-5">
                             {/* Render items */}
                             {childrenData.map((item: FileFolderType) => {
                                 return (
-                                    <div className="flex" key={item.id}>
-                                        <div className="relative right-8 top-4 z-50 h-0 order-2">
+                                    <div className="flex items-center justify-center" key={item.id}>
+                                        <div className="relative right-9 bottom-16 h-0 order-2">
                                             {/* Option button */}
                                             <OptionButton onSingleClick={onSingleClick} item={item} />
                                         </div>

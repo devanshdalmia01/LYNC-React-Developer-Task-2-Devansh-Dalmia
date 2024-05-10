@@ -1,6 +1,6 @@
 # File Explorer by Devansh Dalmia
 
-![File Explorer Logo made using AI](./src/Assets/file-explorer-logo.webp)
+![File Explorer Logo made using AI](./src/Assets/for_readme.png)
 
 # Overview
 

@@ -129,7 +129,7 @@ const Modal: FC = () => {
         <Transition appear show={isOpen} as={Fragment}>
             <Dialog
                 as="div"
-                className="relative z-50"
+                className="relative z-20"
                 open={isOpen}
                 onClose={() => {
                     closeModal();

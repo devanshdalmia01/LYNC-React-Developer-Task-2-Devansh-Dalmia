@@ -2,8 +2,8 @@ import { FC, memo } from "react";
 
 const Footer: FC = memo(() => {
     return (
-        <footer className="bg-secondary w-[390px] h-[39px] text-white text-center -mt-[39px]">
-            <h1>
+        <footer className="bg-transparent w-full h-[5vh] text-white flex">
+            <h1 className="bg-secondary h-full w-[25vw] flex justify-center items-center">
                 &copy; 2024&nbsp;
                 <a
                     className="hover:text-gray-400"
@@ -15,6 +15,7 @@ const Footer: FC = memo(() => {
                 </a>
                 &nbsp;| All Rights Reserved
             </h1>
+            <div className="w-[75vw] h-full bg-gray-50"></div>
         </footer>
     );
 });

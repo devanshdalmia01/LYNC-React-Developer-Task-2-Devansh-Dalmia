@@ -12,18 +12,18 @@ const Navbar: FC = memo(() => {
     const { inRecycleBin } = useRecycleBin();
 
     return (
-        <header className="flex">
-            <section>
+        <header className="flex h-[15vh]">
+            <section className="w-[25vw] bg-secondary flex justify-center items-center">
                 {/* Link to the home page, displaying the application logo and name. */}
-                <Link className="-ml-3 -mt-3 pr-8 flex bg-secondary text-white items-center" to="/folders/0">
-                    <img width="175px" src={Logo} alt="App Logo" />
+                <Link className="pt-5 flex text-white items-center" to="/folders/0">
+                    <img className="mr-10" width="100px" src={Logo} alt="App Logo" />
                     <div>
                         <h1 className="text-4xl font-extrabold">File Explorer</h1>
                         <sub className="text-lg float-end">by Devansh</sub>
                     </div>
                 </Link>
             </section>
-            <section className="ml-5 flex flex-grow w-[35%] items-center overflow-x-scroll">
+            <section className="ml-5 flex flex-grow w-[35vw] items-center overflow-x-scroll">
                 {/* Conditionally display the breadcrumb navigation or recycle bin label based on the context. */}
                 {!inRecycleBin ? (
                     <div className="flex items-center">
@@ -33,7 +33,7 @@ const Navbar: FC = memo(() => {
                     <div className="text-4xl font-extrabold mt-2">🗑️ Recycle Bin</div>
                 )}
             </section>
-            <section className="flex items-center mr-3 w-[10%]">
+            <section className="flex items-center mr-3 w-[10vw]">
                 {/* Buttons for actions that change depending on whether the user is in the recycle bin or not. */}
                 <div className="flex flex-grow justify-evenly mr-3">
                     <Button type={!inRecycleBin ? BUTTONS.RENAME_BUTTON : BUTTONS.RESTORE_BUTTON} />

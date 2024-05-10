@@ -8,7 +8,7 @@ const SideExplorer: FC = () => {
     const navigate = useNavigate(); // Hook to programmatically navigate between routes.
     const { inRecycleBin, recycleBinItemCount } = useRecycleBin(); // Access to recycle bin-related state.
     return (
-        <nav className="bg-secondary flex flex-col w-[390px] h-[78vh] overflow-y-scroll pb-20 pr-1.5 text-white">
+        <nav className="bg-secondary flex flex-col w-[25vw] h-[80vh] overflow-y-scroll pb-20 pr-1.5 text-white">
             <div className="flex-grow mt-5 w-full overflow-x-scroll">
                 {/* Render the main sidebar item, to view the heirarchy of all the data */}
                 <SidebarItem currentId="0" isFolder={1} />

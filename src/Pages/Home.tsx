@@ -38,7 +38,7 @@ const Home: FC = () => {
             <section className="flex">
                 <SideExplorer />
                 <main
-                    className="bg-gray-50 pt-5 w-[74vw] h-[82.5vh] overflow-y-scroll"
+                    className="bg-gray-50 w-[75vw] h-[80vh] overflow-y-scroll"
                     onClick={(e: MouseEvent) => {
                         e.stopPropagation(); // Prevents the event from bubbling up the event chain.
                         e.preventDefault(); // Prevents the default action the browser makes on that event.
