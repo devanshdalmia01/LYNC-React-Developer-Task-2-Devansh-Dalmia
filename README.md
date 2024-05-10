@@ -21,9 +21,10 @@ File Explorer is a web-based application designed to simulate a file system inte
 4. [Edge Cases](#edge-cases)
 5. [Future Scope](#future-scope)
 6. [Dependencies And Technology Stack](#dependencies-and-technology-stack)
-7. [Contribution](#contribution)
-8. [Authors](#authors)
-9. [License](#license)
+7. [Performance](#performance)
+8. [Contribution](#contribution)
+9. [Authors](#authors)
+10. [License](#license)
 
 # Demo
 
@@ -123,6 +124,8 @@ When inside recycle bin, you can click `Empty Recycle Bin` from navbar to delete
 
 7. **Multiple Selection**: Enable selecting multiple files or folders simultaneously to delete, move, or apply other operations, similar to desktop file managers.
 
+8. **Mobile Friendly/Responsive App**: Add CSS and make the app responsive according to different devices big or small
+
 # Dependencies And Technology Stack
 
 I used a tried and tested tech stack. This resulted in a fast, performant, and easily-extensible web app that should be fairly future-proof for the coming next several years. I used:
@@ -138,6 +141,10 @@ I used a tried and tested tech stack. This resulted in a fast, performant, and e
 -   [React Tooltip](https://www.npmjs.com/package/react-tooltip) - For adding tooltips to increase user experience.
 -   [Use Double Click](https://www.npmjs.com/package/use-double-click) - For correctly handling double and single clicks.
 -   [UUID](https://www.npmjs.com/package/uuid) - To get unique Ids
+
+# Performance
+
+-   [Google PageSpeed Insights](https://pagespeed.web.dev/analysis/https-fileexplorer-devansh-netlify-app/2gnwb63waa?form_factor=desktop)
 
 # Contribution
 
