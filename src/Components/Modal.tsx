@@ -188,6 +188,7 @@ const Modal: FC = () => {
                                         type === MODALS.RENAME_FILE ||
                                         type === MODALS.RENAME_FOLDER) && (
                                         <input
+                                            name="folder/file name"
                                             data-autofocus
                                             value={data as string}
                                             onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -201,6 +202,7 @@ const Modal: FC = () => {
                                     )}
                                     {type === MODALS.UPLOAD_FILE && (
                                         <input
+                                            name="file"
                                             ref={fileUploadRef}
                                             onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                                 e.stopPropagation();
