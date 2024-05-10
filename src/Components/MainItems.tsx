@@ -100,6 +100,7 @@ const MainItems: FC = () => {
                 )}
                 <div className="relative flex w-[15%] justify-center items-center">
                     <select
+                        name="type filter"
                         defaultChecked={true}
                         value={typeFilter}
                         onChange={(e) => {
@@ -121,6 +122,7 @@ const MainItems: FC = () => {
                 </div>
                 <div className="relative flex w-[25%] justify-center items-center">
                     <select
+                        name="sort header"
                         defaultChecked={true}
                         value={sort}
                         onChange={(e) => {
