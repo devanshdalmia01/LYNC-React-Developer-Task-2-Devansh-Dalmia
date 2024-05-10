@@ -13,6 +13,10 @@ File Explorer is a web-based application designed to simulate a file system inte
 -   **UUID-based Navigation**: Secure and robust handling of file paths using UUIDs.
 -   **Interactive UI**: User-friendly interface with context menus.
 
+# Special Features
+
+-   **Sorting, Filtering**: You can choose to view your files and folders the way you want. Complete control. All options are available to work together
+
 # Table of Contents
 
 1. [Demo](#demo)
