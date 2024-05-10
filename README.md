@@ -70,6 +70,8 @@ Ensure you have the following installed:
 
 -   **Home**: Access the main interface by navigating to the root URL `/`.
 -   **Recycle Bin**: Click on the `recycle bin icon` or navigate to `/recyclebin` to view deleted items.
+-   **Folders**: You can `double click` on the folders to navigate into them or you can `single click` on the `sidebar` to go to that particular folder
+-   **Backwards/Forwards**: You can navigate across appliation using browser's backward and forward buttons. The built in `Go Back` button will only take you to `previous directory` of the current path.
 
 ## Managing Files and Folders
 

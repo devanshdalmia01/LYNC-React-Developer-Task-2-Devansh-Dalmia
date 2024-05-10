@@ -1,11 +1,17 @@
 import { FC, MouseEvent } from "react";
 import { BUTTONS, ButtonInfo, MODALS } from "../Types/enums";
-import { useModal, useSelectedItem } from "../Hooks/hooks";
+import { useCurrentLocation, useModal, useRecycleBin, useSelectedItem } from "../Hooks/hooks";
+import { useNavigate } from "react-router-dom";
+import { memoizedComputePath } from "../Utils/helper";
 
 // Component for rendering a button that triggers various modal dialogs and actions based on its type.
 const Button: FC<{ type: BUTTONS }> = ({ type }) => {
+    const navigate = useNavigate();
+
+    const { inRecycleBin } = useRecycleBin();
     const { id, isFolder, name } = useSelectedItem(); // Context hook to get selected item details.
     const { openModal, setAcceptPressed } = useModal(); // Context hook to manage modal dialogs.
+    const { activePosition, currentPath } = useCurrentLocation();
 
     // Extract button styling and content based on its type.
     const { text, className, conditionalClassName, icon } = ButtonInfo[type];
@@ -38,6 +44,9 @@ const Button: FC<{ type: BUTTONS }> = ({ type }) => {
                 break;
             case BUTTONS.UPLOAD_FILE_BUTTON:
                 openModal(MODALS.UPLOAD_FILE, new File([""], "", { type: "text/html" }));
+                break;
+            case BUTTONS.BACK_BUTTON:
+                navigate(inRecycleBin ? "/folders/0" : memoizedComputePath(activePosition - 1, currentPath));
                 break;
         }
     };

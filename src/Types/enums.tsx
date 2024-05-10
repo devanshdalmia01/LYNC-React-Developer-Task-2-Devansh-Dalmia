@@ -2,6 +2,7 @@ import { ButtonConfig, ModalConfig } from "./interface";
 import { FaEdit, FaFileUpload, FaUndo } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { AiFillFolderAdd } from "react-icons/ai";
+import { IoArrowBackCircleSharp } from "react-icons/io5";
 
 // Enum to define different views such as grid and list.
 export enum VIEW {
@@ -56,6 +57,7 @@ export enum BUTTONS {
     EMPTY_BIN_BUTTON,
     RESTORE_BUTTON,
     RESTORE_OPTION_BUTTON,
+    BACK_BUTTON,
 }
 
 // Configuration objects for each type of modal dialog used in the application.
@@ -199,5 +201,12 @@ export const ButtonInfo: Record<BUTTONS, ButtonConfig> = {
         className: optionButtonClass,
         conditionalClassName: "",
         icon: <FaUndo className={optionButtonIconClass} />,
+    },
+    [BUTTONS.BACK_BUTTON]: {
+        text: "Go Back",
+        className:
+            "flex justify-center items-center w-[125px] bg-white border-[1px] border-gray-400 pb-1 pt-1.5 px-3 text-md font-medium rounded-full text-secondary",
+        conditionalClassName: "",
+        icon: <IoArrowBackCircleSharp className={buttonWithTextIconClass} />,
     },
 };

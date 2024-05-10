@@ -1,5 +1,5 @@
 import { FC, useState, MouseEvent, useEffect } from "react";
-import { SORT_ORDER, SORT_TYPE, TYPE_FILTER, VIEW } from "../Types/enums";
+import { BUTTONS, SORT_ORDER, SORT_TYPE, TYPE_FILTER, VIEW } from "../Types/enums";
 import { FaFolder, FaFile } from "react-icons/fa";
 import {
     useSelectedItem,
@@ -19,6 +19,7 @@ import { Radio, RadioGroup } from "@headlessui/react";
 import { IoMdRadioButtonOn, IoMdRadioButtonOff, IoIosArrowDown } from "react-icons/io";
 import { db } from "../Utils/db";
 import { Tooltip } from "react-tooltip";
+import Button from "./Button";
 
 const MainItems: FC = () => {
     const navigate = useNavigate();
@@ -89,7 +90,14 @@ const MainItems: FC = () => {
     return (inRecycleBin && recycleBinItemCount > 0) || (!inRecycleBin && itemChildrenCount > 0) ? (
         // Render if data exists
         <>
-            <div className="flex justify-evenly sticky top-0 z-10 py-5 bg-gray-50">
+            <div className="flex justify-evenly sticky top-0 z-10 py-5 h-[88px] bg-gray-50">
+                {!(currentPath.length === 1 && currentPath[0] === "0") ? (
+                    <div className="w-[12%] flex items-center">
+                        <Button type={BUTTONS.BACK_BUTTON} />
+                    </div>
+                ) : (
+                    <div className="w-[12%] invisible" />
+                )}
                 <div className="relative flex w-[15%] justify-center items-center">
                     <select
                         defaultChecked={true}
@@ -233,7 +241,7 @@ const MainItems: FC = () => {
                         </>
                     ) : (
                         // Render as grid
-                        <div className="ml-6 grid grid-cols-5 space-y-reverse space-y-5 pb-5">
+                        <div className="ml-6 grid grid-cols-5 gap-5 pb-5">
                             {/* Render items */}
                             {childrenData.map((item: FileFolderType) => {
                                 return (
@@ -288,9 +296,18 @@ const MainItems: FC = () => {
         </>
     ) : (
         // Render if no data
-        <div className="w-full h-[50vh] flex items-center justify-center">
-            <h1 className="text-3xl font-bold text-primary">No file or folders added!</h1>
-        </div>
+        <>
+            {!(currentPath.length === 1 && currentPath[0] === "0") && (
+                <div className="flex justify-start sticky top-0 z-10 py-5 h-[88px] bg-gray-50">
+                    <div className="w-[12%] flex items-center ml-[31.5px]">
+                        <Button type={BUTTONS.BACK_BUTTON} />
+                    </div>
+                </div>
+            )}
+            <div className="w-full h-[50vh] flex items-center justify-center">
+                <h1 className="text-3xl font-bold text-primary">No file or folders added!</h1>
+            </div>
+        </>
     );
 };
 
