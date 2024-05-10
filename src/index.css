@@ -20,3 +20,9 @@
 *:focus {
     outline: none;
 }
+
+.react-tooltip {
+    font-size: 12px !important;
+    font-weight: 300;
+    padding: 6px !important;
+}

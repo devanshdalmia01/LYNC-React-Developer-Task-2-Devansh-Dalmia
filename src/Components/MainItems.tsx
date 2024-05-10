@@ -18,6 +18,7 @@ import OptionButton from "./OptionButton";
 import { Radio, RadioGroup } from "@headlessui/react";
 import { IoMdRadioButtonOn, IoMdRadioButtonOff, IoIosArrowDown } from "react-icons/io";
 import { db } from "../Utils/db";
+import { Tooltip } from "react-tooltip";
 
 const MainItems: FC = () => {
     const navigate = useNavigate();
@@ -261,7 +262,12 @@ const MainItems: FC = () => {
                                                     </>
                                                 )}
                                             </span>
-                                            <span className="font-extrabold flex flex-col">
+                                            <Tooltip id={item.id} />
+                                            <span
+                                                className="font-extrabold flex flex-col"
+                                                data-tooltip-id={item.id}
+                                                data-tooltip-content={item.name}
+                                            >
                                                 {item.name?.slice(0, 13)}
                                                 <span className="font-light text-xs text-gray-400">
                                                     {item.isFolder ? (
