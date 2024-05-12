@@ -3,15 +3,16 @@ import { Dialog, DialogPanel, DialogTitle, Description, Transition, TransitionCh
 import { MODALS, ModalInfo } from "../Types/enums";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
-import { getErrorMessage } from "../Utils/helper";
-import { useParams } from "react-router-dom";
-import { useFileFolders, useRecycleBin, useSelectedItem, useModal } from "../Hooks/hooks";
+import { getErrorMessage, memoizedComputePath } from "../Utils/helper";
+import { useNavigate } from "react-router-dom";
+import { useFileFolders, useRecycleBin, useSelectedItem, useModal, useCurrentLocation } from "../Hooks/hooks";
 
 const Modal: FC = () => {
     const fileUploadRef = useRef<HTMLInputElement>(null);
 
-    const { "*": splat } = useParams();
+    const navigate = useNavigate();
 
+    const { currentPath, activePosition } = useCurrentLocation();
     const { AddNewFileFolder, RenameFileFolder } = useFileFolders();
     const { PermanentlyDeleteFileFolder, EmptyRecycleBin, RestoreFileFolder, DeleteFileFolder } = useRecycleBin();
     const {
@@ -29,16 +30,22 @@ const Modal: FC = () => {
 
     // Handle different modal confirmations based on the type
     const handleAccept = () => {
-        let path: string[] = splat?.split("/").map((value) => value) as string[];
         switch (type) {
             case MODALS.UPLOAD_FILE:
             case MODALS.NEW_FOLDER:
+                if (!(data instanceof String ? data.length : data instanceof File ? data.name.length : data)) {
+                    setAcceptPressed(false);
+                    toast.error("Please enter something!", {
+                        toastId: "error",
+                    });
+                    return;
+                }
                 const fileInfo = {
                     id: uuidv4(),
                     name: data instanceof File ? data.name : (data as string),
                     isFolder: type === MODALS.NEW_FOLDER ? 1 : 0,
-                    parentId: path[path.length - 1],
-                    parentLineage: path.join("/"),
+                    parentId: currentPath[activePosition],
+                    parentLineage: currentPath.join("/"),
                     lastModifiedTime: data instanceof File ? new Date(data.lastModified) : new Date(),
                     childrenCount: 0,
                     size: data instanceof File ? data.size : 0,
@@ -46,7 +53,9 @@ const Modal: FC = () => {
                 AddNewFileFolder(fileInfo)
                     .then(() => closeModal())
                     .catch((error) => {
-                        toast.error(getErrorMessage(error));
+                        toast.error(getErrorMessage(error), {
+                            toastId: "error",
+                        });
                         setAcceptPressed(false);
                     });
                 break;
@@ -63,7 +72,9 @@ const Modal: FC = () => {
                         closeModal();
                     })
                     .catch((error) => {
-                        toast.error(getErrorMessage(error));
+                        toast.error(getErrorMessage(error), {
+                            toastId: "error",
+                        });
                         setAcceptPressed(false);
                     });
                 break;
@@ -72,8 +83,15 @@ const Modal: FC = () => {
                 DeleteFileFolder({
                     id: id,
                 })
+                    .then(() => {
+                        if (currentPath[activePosition] === id) {
+                            navigate(memoizedComputePath(activePosition - 1, currentPath));
+                        }
+                    })
                     .catch((error) => {
-                        toast.error(getErrorMessage(error));
+                        toast.error(getErrorMessage(error), {
+                            toastId: "error",
+                        });
                     })
                     .finally(() => {
                         setId("");
@@ -88,7 +106,9 @@ const Modal: FC = () => {
                     id: id,
                 })
                     .catch((error) => {
-                        toast.error(getErrorMessage(error));
+                        toast.error(getErrorMessage(error), {
+                            toastId: "error",
+                        });
                     })
                     .finally(() => {
                         setId("");
@@ -100,7 +120,9 @@ const Modal: FC = () => {
             case MODALS.EMPTY_BIN:
                 EmptyRecycleBin()
                     .catch((error) => {
-                        toast.error(getErrorMessage(error));
+                        toast.error(getErrorMessage(error), {
+                            toastId: "error",
+                        });
                     })
                     .finally(() => {
                         closeModal();
@@ -110,7 +132,11 @@ const Modal: FC = () => {
                 RestoreFileFolder({
                     id: id,
                 })
-                    .catch((error) => toast.error(getErrorMessage(error)))
+                    .catch((error) =>
+                        toast.error(getErrorMessage(error), {
+                            toastId: "error",
+                        })
+                    )
                     .finally(() => {
                         setId("");
                         setIsFolder(0);

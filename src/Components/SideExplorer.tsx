@@ -20,7 +20,9 @@ const SideExplorer: FC = () => {
                 onClick={(e: MouseEvent) => {
                     e.stopPropagation();
                     e.preventDefault();
-                    navigate("/recyclebin"); // Navigate to the recycle bin view.
+                    if (!inRecycleBin) {
+                        navigate("/recyclebin"); // Navigate to the recycle bin view.
+                    }
                 }}
             >
                 <RiDeleteBin6Fill className="mr-2 -mt-1" />

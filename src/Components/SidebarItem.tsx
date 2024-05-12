@@ -102,7 +102,9 @@ const SidebarItem: FC<{ currentId: string; isFolder: number }> = ({ currentId, i
                         setIsFolder(itemData?.isFolder);
                         setName(itemData?.name);
                     } else {
-                        toast.error("You cannot edit Home!");
+                        toast.error("You cannot edit Home!", {
+                            toastId: "error",
+                        });
                     }
                 }}
                 className={`flex mb-0.5 ${
@@ -119,10 +121,14 @@ const SidebarItem: FC<{ currentId: string; isFolder: number }> = ({ currentId, i
                                 itemData.parentLineage === "" ? [] : [...itemData.parentLineage.split("/")];
                             navigate(memoizedComputePath(temp.push(itemData.id) - 1, temp));
                         } catch (error) {
-                            toast.error(getErrorMessage(error));
+                            toast.error(getErrorMessage(error), {
+                                toastId: "error",
+                            });
                         }
                     } else {
-                        toast.error("Opening a file is not supported, yet!");
+                        toast.error("Opening a file is not supported, yet!", {
+                            toastId: "error",
+                        });
                     }
                 }}
             >

@@ -59,7 +59,9 @@ const MainItems: FC = () => {
         e.stopPropagation();
         e.preventDefault();
         if (inRecycleBin) {
-            toast.error("Restore to navigate!");
+            toast.error("Restore to navigate!", {
+                toastId: "error",
+            });
         } else if (item.isFolder) {
             const checkInPath: number = currentPath.findIndex((value) => value === item.id);
             if (checkInPath !== -1) {
@@ -70,7 +72,9 @@ const MainItems: FC = () => {
                 navigate(memoizedComputePath(tempLength - 1, temp));
             }
         } else {
-            toast.error("Opening a file is not supported, yet!");
+            toast.error("Opening a file is not supported, yet!", {
+                toastId: "error",
+            });
         }
     };
 

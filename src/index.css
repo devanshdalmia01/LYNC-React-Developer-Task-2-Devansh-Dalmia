@@ -26,3 +26,13 @@
     font-weight: 300;
     padding: 6px !important;
 }
+
+* {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+* ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}

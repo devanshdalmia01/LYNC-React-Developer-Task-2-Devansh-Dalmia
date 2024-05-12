@@ -223,7 +223,9 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
                 const recycleBin = await db.recycleBin.get("-1");
                 setRecycleBinItemCount(recycleBin?.childrenCount ?? 0);
             } catch (error) {
-                toast.error("Failed to load recycle bin information.");
+                toast.error("Failed to load recycle bin information.", {
+                    toastId: "error",
+                });
             }
         };
 
@@ -272,7 +274,9 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
                 }
             }
         } catch (error) {
-            throw new Error("Failed to delete the item due to an internal error.");
+            toast.error(getErrorMessage(error), {
+                toastId: "error",
+            });
         }
     };
 
@@ -306,7 +310,9 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
                 setRecycleBinItemCount(updatedRecycleBinCount);
             });
         } catch (error) {
-            throw new Error("Failed to perform delete operations due to an internal error.");
+            toast.error(getErrorMessage(error), {
+                toastId: "error",
+            });
         }
     };
 
@@ -321,15 +327,26 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
             // Verify the parent exists or reset to "Home".
             const parentLineage = itemToRestore.parentLineage.split("/");
             const lastKnownParentId = parentLineage[parentLineage.length - 1];
-            const parentFolder = await db.filesAndFolders.get(lastKnownParentId);
+            itemToRestore.parentId = lastKnownParentId;
+            let parentFolder = await db.filesAndFolders.get(lastKnownParentId);
 
             // If the original parent doesn't exist anymore, reset to "Home"
             if (!parentFolder) {
-                toast.warning('Parent directory does not exist. Restoring to "Home".');
+                toast.warning('Parent directory does not exist. Restoring to "Home".', {
+                    toastId: "warning",
+                });
                 itemToRestore.parentId = "0";
                 itemToRestore.parentLineage = "0";
-            } else {
-                itemToRestore.parentId = lastKnownParentId;
+                parentFolder = await db.filesAndFolders.get(itemToRestore.parentId);
+            }
+
+            const dupCheck = await db.filesAndFolders.get({
+                name: itemToRestore.name,
+                parentId: parentFolder?.id,
+                isFolder: itemToRestore.isFolder,
+            });
+            if (dupCheck) {
+                throw new Error("Encountered duplicate item while restoring, please rename first and then restore!");
             }
 
             itemToRestore.lastModifiedTime = new Date();
@@ -342,8 +359,8 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
                 await db.recycleBin.delete(data.id);
 
                 // Subtract from the count of recycle bin
-                const parentFolder = await db.recycleBin.get("-1");
-                const updatedRecycleBinCount = (parentFolder?.childrenCount ?? 1) - 1;
+                const recycleBin = await db.recycleBin.get("-1");
+                const updatedRecycleBinCount = (recycleBin?.childrenCount ?? 1) - 1;
                 await db.recycleBin.update("-1", {
                     childrenCount: updatedRecycleBinCount,
                     lastModifiedTime: new Date(),
@@ -358,7 +375,9 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
                 });
             });
         } catch (error) {
-            throw new Error("Failed to restore due to an internal error.");
+            toast.error(getErrorMessage(error), {
+                toastId: "error",
+            });
         }
     };
 
@@ -404,7 +423,9 @@ export const RecycleBinProvider: FC<ProviderType> = ({ children }) => {
                 }
             });
         } catch (error) {
-            throw new Error("Failed to perform operations due to an internal error.");
+            toast.error(getErrorMessage(error), {
+                toastId: "error",
+            });
         }
     };
 

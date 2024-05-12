@@ -43,7 +43,10 @@ const Breadcrumb: FC = memo(() => {
         if (deletedItem !== "") {
             navigate("/recyclebin");
             toast.error(
-                `${deletedItem}, this folder you are trying to navigate is deleted! Please restore to navigate!`
+                `${deletedItem}, this folder you are trying to navigate is deleted! Please restore to navigate!`,
+                {
+                    toastId: "error",
+                }
             );
         }
     }, [deletedItem]);
